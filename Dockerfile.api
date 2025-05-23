@@ -1,0 +1,22 @@
+# Build stage
+  FROM node:alpine AS build
+  WORKDIR /app
+  COPY package*.json ./
+  COPY turbo.json ./
+  COPY apps/api/package.json ./apps/api/
+  RUN npm install
+  COPY . .
+  RUN npm run build --workspace=apps/api
+
+  # Development stage
+  FROM node:alpine AS development
+  WORKDIR /app
+  COPY --from=build /app .
+  CMD ["sh", "-c", "npm run dev --workspace=apps/api"]
+
+  # Production stage
+  FROM node:alpine AS production
+  WORKDIR /app
+  COPY --from=build /app/dist/apps/api ./dist
+  COPY --from=build /app/node_modules ./node_modules
+  CMD ["node", "dist/main.js"]

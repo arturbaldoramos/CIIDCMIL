@@ -1,4 +1,9 @@
 {
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "start": "turbo run start"
+  },
   "packageManager": "npm@8.5.0",
   "workspaces": [
     "apps/*",
