@@ -8,9 +8,12 @@ import { AppService } from './app.service';
 @Module({
   imports: [
     UserModule,
-    AuthModule,],
+    AuthModule,
+  ],
   controllers: [
-    AuthController, AppController],
+    AuthController, 
+    AppController
+  ],
   providers: [AppService],
 })
 export class AppModule { }
