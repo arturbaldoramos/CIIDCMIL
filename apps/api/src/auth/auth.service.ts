@@ -47,8 +47,34 @@ export class AuthService {
       subject: 'Confirmação de Registro',
 
       html: `
-        <p>Olá! ${user.id} Seu registro foi recebido e está aguardando aprovação.</p>
-        <a href="http://localhost:3000/auth/verify-email?token=${token}">Clique aqui para verificar seu Email</a>
+        <!DOCTYPE html>
+        <html lang="pt-BR">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Verificação de E-mail</title>
+          <style type="text/css">
+          .button:hover { background-color: #1557b0; }
+        </style>
+        </head>
+        <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
+          <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+            <div style="background-color: #1a73e8; color: #ffffff; text-align: center; padding: 10px 0; border-radius: 8px 8px 0 0;">
+              <h2>Verificação de E-mail</h2>
+            </div>
+            <div style="padding: 20px; text-align: center;">
+              <p style="font-size: 16px; color: #333333;">Olá! ${name},</p>
+              <p style="font-size: 16px; color: #333333;">Obrigado por se registrar! Seu e-mail precisa ser verificado antes que possamos prosseguir com a aprovação do seu cadastro. Clique no botão abaixo para confirmar seu endereço de e-mail:</p>
+              <a href="http://localhost:3000/auth/verify-email?token=${token}" class="button" style="display: inline-block; padding: 12px 25px; background-color: #1a73e8; color: #ffffff; text-decoration: none; border-radius: 5px; font-size: 16px; margin-top: 20px;">Verificar E-mail Agora</a>
+              <p style="font-size: 14px; color: #333333; margin-top: 20px;">Se você não solicitou este registro, por favor, ignore este e-mail.</p>
+            </div>
+            <div style="text-align: center; font-size: 12px; color: #777777; margin-top: 20px;">
+              <p>Este é um e-mail automático. Por favor, não responda diretamente.</p>
+              <p>© ${new Date().getFullYear()} CIIDCMIL. Todos os direitos reservados.</p>
+            </div>
+          </div>
+        </body>
+        </html>
       `,
     });
 
