@@ -5,6 +5,10 @@ export class RegisterDto {
   email: string;
 
   @IsString()
+  @MinLength(3)
+  name: string;
+
+  @IsString()
   @MinLength(8)
   @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
     message: 'Senha fraca. Deve conter pelo menos 8 caracteres, uma maiúscula, uma minúscula e um número ou símbolo.',
