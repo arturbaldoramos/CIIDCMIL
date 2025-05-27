@@ -1,18 +1,20 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { HomePage } from './pages/homePage';
 import { WelcomePage } from './pages/WelcomePage';
+import { ThemeProvider } from './Components/theme-provider';
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/welcome" element={<WelcomePage />} />
-        {/* Add more routes for your questionnaire pages here */}
-      </Routes>
-    </Router>
-  );
+    <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+      <Router>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/welcome" element={<WelcomePage />} />
+          {/* Add more routes for your questionnaire pages here */}
+        </Routes>
+      </Router>
+    </ThemeProvider>
+  )
 }
 
 export default App;
