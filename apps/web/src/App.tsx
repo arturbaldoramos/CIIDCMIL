@@ -1,13 +1,18 @@
-import './App.css'
-import SurveyPage from './pages/SurveyPage'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { HomePage } from './pages/homePage';
+import { WelcomePage } from './pages/WelcomePage';
 
 function App() {
   return (
-    <main className='0 flex relative justify-center'>
-    <SurveyPage />
-
-    </main>
-  )
+    <Router>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/welcome" element={<WelcomePage />} />
+        {/* Add more routes for your questionnaire pages here */}
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;
