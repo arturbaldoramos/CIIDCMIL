@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { HomePage } from './pages/homePage';
+import { HomePage } from './pages/HomePage';
 import { WelcomePage } from './pages/WelcomePage';
 import { ThemeProvider } from './Components/theme-provider';
 
