@@ -16,6 +16,7 @@ dist
 dist-ssr
 *.local
 .turbo
+.env
 
 #api
 ./apps/api/.env
@@ -30,7 +31,7 @@ dist-ssr
 ./apps/api/yarn-error.log*
 ./apps/api/pnpm-debug.log*
 ./apps/api/lerna-debug.log*
-
+./apps/api/generated/prisma
 
 #web
 ./apps/web/logs
@@ -40,3 +41,26 @@ dist-ssr
 ./apps/web/yarn-error.log*
 ./apps/web/pnpm-debug.log*
 ./apps/web/lerna-debug.log*
+apps/api/generated/prisma/client.d.ts
+apps/api/generated/prisma/client.js
+apps/api/generated/prisma/default.d.ts
+apps/api/generated/prisma/default.js
+apps/api/generated/prisma/edge.d.ts
+apps/api/generated/prisma/edge.js
+apps/api/generated/prisma/index.d.ts
+apps/api/generated/prisma/index.js
+apps/api/generated/prisma/index-browser.js
+apps/api/generated/prisma/package.json
+apps/api/generated/prisma/query_engine-windows.dll.node
+apps/api/generated/prisma/schema.prisma
+apps/api/generated/prisma/wasm.d.ts
+apps/api/generated/prisma/wasm.js
+apps/api/generated/prisma/runtime/edge.js
+apps/api/generated/prisma/runtime/edge-esm.js
+apps/api/generated/prisma/runtime/index-browser.d.ts
+apps/api/generated/prisma/runtime/index-browser.js
+apps/api/generated/prisma/runtime/library.d.ts
+apps/api/generated/prisma/runtime/library.js
+apps/api/generated/prisma/runtime/react-native.js
+apps/api/generated/prisma/runtime/wasm.js
+apps/api/prisma/schema.prisma

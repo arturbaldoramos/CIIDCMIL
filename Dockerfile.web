@@ -1,0 +1,21 @@
+# Build stage
+  FROM node:alpine AS build
+  WORKDIR /app
+  COPY package*.json ./
+  COPY turbo.json ./
+  COPY apps/web/package.json ./apps/web/
+  RUN npm install
+  COPY . .
+  RUN npm run build --workspace=apps/web
+
+  # Development stage
+  FROM node:alpine AS development
+  WORKDIR /app
+  COPY --from=build /app .
+  CMD ["sh", "-c", "npm run dev --workspace=apps/web"]
+
+  # Production stage
+  FROM nginx:alpine AS production
+  COPY --from=build /app/apps/web/dist /usr/share/nginx/html
+  EXPOSE 80
+  CMD ["nginx", "-g", "daemon off;"]
