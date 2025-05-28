@@ -8,6 +8,7 @@
 *.njsproj
 *.sln
 *.sw?
+.vs
 
 # geral
 node_modules
