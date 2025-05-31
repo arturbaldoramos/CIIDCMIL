@@ -17,7 +17,6 @@ export function HomePage() {
 
         <Button
           onClick={handleNextClick}
-          variant={"default"}
           size="lg"
         >
           Próximo

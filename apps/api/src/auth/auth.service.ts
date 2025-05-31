@@ -65,7 +65,7 @@ export class AuthService {
             <div style="padding: 20px; text-align: center;">
               <p style="font-size: 16px; color: #333333;">Olá! ${name},</p>
               <p style="font-size: 16px; color: #333333;">Obrigado por se registrar! Seu e-mail precisa ser verificado antes que possamos prosseguir com a aprovação do seu cadastro. Clique no botão abaixo para confirmar seu endereço de e-mail:</p>
-              <a href="http://localhost:3000/auth/verify-email?token=${token}" class="button" style="display: inline-block; padding: 12px 25px; background-color: #1a73e8; color: #ffffff; text-decoration: none; border-radius: 5px; font-size: 16px; margin-top: 20px;">Verificar E-mail Agora</a>
+              <a href="http://localhost:5173/verify-email?token=${token}" class="button" style="display: inline-block; padding: 12px 25px; background-color: #1a73e8; color: #ffffff; text-decoration: none; border-radius: 5px; font-size: 16px; margin-top: 20px;">Verificar E-mail Agora</a>
               <p style="font-size: 14px; color: #333333; margin-top: 20px;">Se você não solicitou este registro, por favor, ignore este e-mail.</p>
             </div>
             <div style="text-align: center; font-size: 12px; color: #777777; margin-top: 20px;">

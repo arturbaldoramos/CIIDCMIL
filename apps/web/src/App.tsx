@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { HomePage } from './pages/HomePage';
 import { WelcomePage } from './pages/WelcomePage';
 import { ThemeProvider } from './Components/theme-provider';
+import VerifyEmailPage from './pages/VerifyEmail';
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/welcome" element={<WelcomePage />} />
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
           {/* Add more routes for your questionnaire pages here */}
         </Routes>
       </Router>
