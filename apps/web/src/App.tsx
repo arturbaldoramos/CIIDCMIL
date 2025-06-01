@@ -3,6 +3,7 @@ import { HomePage } from './pages/HomePage';
 import { WelcomePage } from './pages/WelcomePage';
 import { ThemeProvider } from './Components/theme-provider';
 import VerifyEmailPage from './pages/VerifyEmail';
+import LoginPage from './pages/LoginPage';
 
 function App() {
   return (
@@ -12,6 +13,8 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/welcome" element={<WelcomePage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
+          <Route path="/login" element={<LoginPage />} />
+
           {/* Add more routes for your questionnaire pages here */}
         </Routes>
       </Router>
