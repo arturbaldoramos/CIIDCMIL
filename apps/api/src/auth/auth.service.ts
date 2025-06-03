@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpStatus } from '@nestjs/common';
 import { RegisterDto } from './register.dto';
 import * as bcrypt from 'bcrypt';
 import { MailerService } from '@nestjs-modules/mailer';
@@ -21,7 +21,7 @@ export class AuthService {
     // Verificar se o email já existe
     const existingUser = await this.prisma.user.findUnique({ where: { email } });
     if (existingUser) {
-      throw new Error('Email já registrado');
+      throw new Error('Email já registrado', { cause: { statusCode: HttpStatus.CONFLICT } });
     }
 
     // Hash da senha

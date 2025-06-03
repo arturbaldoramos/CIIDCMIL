@@ -12,7 +12,7 @@ export class AuthController {
       const result = await this.authService.register(dto);
       return result;
     } catch (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+      throw new HttpException(error.message, error.cause?.statusCode || HttpStatus.BAD_REQUEST);
     }
   }
 
