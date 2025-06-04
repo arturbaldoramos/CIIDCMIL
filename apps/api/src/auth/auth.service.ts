@@ -1,10 +1,11 @@
 import { Injectable, HttpStatus } from '@nestjs/common';
-import { RegisterDto } from './register.dto';
+import { RegisterDto } from './dtos/register.dto';
 import * as bcrypt from 'bcrypt';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
+import { LoginDto } from './dtos/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -14,6 +15,69 @@ export class AuthService {
     private configService: ConfigService,
     private jwtService: JwtService,
   ) { }
+
+  async login(dto: LoginDto) {
+    const { email, password } = dto
+
+    // Verificar se o usuário existe
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        password: true,
+        emailVerified: true,
+        status: true
+      },
+    })
+
+    if (!user) {
+      throw new Error("Credenciais inválidas", {
+        cause: { statusCode: HttpStatus.UNAUTHORIZED },
+      })
+    }
+
+    // Verificar se o email foi verificado
+    if (!user.emailVerified) {
+      throw new Error("Email não verificado. Verifique sua caixa de entrada.", {
+        cause: { statusCode: HttpStatus.FORBIDDEN },
+      })
+    }
+
+    // Verificar a senha
+    const isPasswordValid = await bcrypt.compare(password, user.password)
+    if (!isPasswordValid) {
+      throw new Error("Credenciais inválidas", {
+        cause: { statusCode: HttpStatus.UNAUTHORIZED },
+      })
+    }
+
+    if (user.status == 'PENDING') {
+      throw new Error('Sua conta ainda não foi aprovada pelo administrador', {
+        cause: { statusCode: HttpStatus.FORBIDDEN }
+      });
+    } else if (user.status == 'SUSPENDED') {
+      throw new Error('Sua conta foi suspensa. Contate o suporte.', {
+        cause: { statusCode: HttpStatus.FORBIDDEN }
+      });
+    } 
+
+    // Gerar token JWT para autenticação
+    const payload = {
+      userId: user.id,
+    }
+    const accessToken = this.jwtService.sign(payload)
+
+    // Retornar dados do usuário (sem a senha) e o token
+    const { password: _, ...userWithoutPassword } = user
+
+    return {
+      message: "Login realizado com sucesso",
+      user: userWithoutPassword,
+      accessToken,
+    }
+  }
 
   async register(dto: RegisterDto) {
     const { email, password, name } = dto;
