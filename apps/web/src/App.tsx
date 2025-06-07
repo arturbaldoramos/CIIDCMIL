@@ -5,7 +5,7 @@ import { ThemeProvider } from './Components/theme-provider';
 import VerifyEmailPage from './pages/VerifyEmail';
 import LoginPage from './pages/LoginPage';
 import { Dashboard } from './pages/Dashboard';
-import { Toaster } from 'sonner';
+import { Toaster } from "@/Components/ui/sonner";
 
 function App() {
   return (
