@@ -69,7 +69,6 @@ export function LoginForm({
 
       // Se a resposta for OK, define o alerta de sucesso
       const data = await response.json()
-      console.log("Login bem-sucedido:", data);
       setAlertMessage({ type: "success", message: "Login realizado com sucesso!" });
 
       // Limpa os campos de email e senha após o login bem-sucedido
@@ -151,7 +150,6 @@ export function LoginForm({
                 {alertMessage && (
                   <Alert variant={alertMessage.type === "error" ? "destructive" : "default"}>
                     {alertMessage.type === "error" ? <ExclamationTriangleIcon className="h-4 w-4" /> : <CheckCircledIcon className="h-4 w-4" />}
-                    <AlertTitle>{alertMessage.type === "error" ? "Erro!" : "Sucesso!"}</AlertTitle>
                     <AlertDescription>
                       {alertMessage.message}
                     </AlertDescription>
