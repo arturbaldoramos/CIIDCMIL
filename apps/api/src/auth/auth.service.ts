@@ -69,12 +69,8 @@ export class AuthService {
     }
     const accessToken = this.jwtService.sign(payload)
 
-    // Retornar dados do usuário (sem a senha) e o token
-    const { password: _, ...userWithoutPassword } = user
-
     return {
       message: "Login realizado com sucesso",
-      user: userWithoutPassword,
       accessToken,
     }
   }

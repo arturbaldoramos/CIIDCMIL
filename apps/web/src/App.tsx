@@ -5,6 +5,7 @@ import { ThemeProvider } from './Components/theme-provider';
 import VerifyEmailPage from './pages/VerifyEmail';
 import LoginPage from './pages/LoginPage';
 import { Dashboard } from './pages/Dashboard';
+import { Toaster } from 'sonner';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           {/* Add more routes for your questionnaire pages here */}
         </Routes>
       </Router>
+      <Toaster position="top-center"/>
     </ThemeProvider>
   )
 }
