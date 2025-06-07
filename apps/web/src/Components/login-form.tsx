@@ -171,9 +171,9 @@ export function LoginForm({
 
           <div className="bg-muted relative hidden md:block">
             <img
-              src="/placeholder.svg"
+              src="/logo_proto.svg"
               alt="Image"
-              className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+              className="absolute inset-0 h-full w-full object-cover dark:opacity-50 dark:grayscale"
             />
           </div>
 
