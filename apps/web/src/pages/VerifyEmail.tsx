@@ -70,7 +70,7 @@ const VerifyEmailPage: React.FC = () => {
             {message}
           </p>
           {!loading && !isError && (
-            <Button className="mt-4" onClick={() => window.location.href = '/auth/login'}>
+            <Button className="mt-4" onClick={() => window.location.href = '/login'}>
               Ir para o Login
             </Button>
           )}
