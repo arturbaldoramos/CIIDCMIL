@@ -1,5 +1,7 @@
+// Dashboard.tsx
 "use client"
 
+import AppSidebar from "@/Components/app-sidebar"
 import { BarrierTypeChart } from "@/Components/charts/BarrierTypeChart"
 import { MonthlyChart } from "@/Components/charts/MontlhyChart"
 import { RegionChart } from "@/Components/charts/RegionChart"
@@ -9,11 +11,12 @@ import { ComparisonModal } from "@/Components/dashboard/ComparsionModal"
 import { DashboardHeader } from "@/Components/dashboard/DashboardHeader"
 import { FilterSection } from "@/Components/dashboard/FilterSection"
 import { MetricsCards } from "@/Components/dashboard/MetricCards"
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/Components/ui/sidebar" // Importe SidebarInset e SidebarTrigger
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs"
 import { barrierTypeData, mockCities, monthlyData, regionData } from "@/data/MockData"
 import { useCityComparison } from "@/hooks/useCityComparsion"
 import { useCityFilters } from "@/hooks/useCityFilters"
-
+import { PanelLeftIcon } from "lucide-react" // Importe PanelLeftIcon para o SidebarTrigger
 
 
 export const Dashboard = () => {
@@ -45,71 +48,84 @@ export const Dashboard = () => {
   } = useCityComparison(mockCities)
 
   return (
-    <div className="min-h-screen p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        <DashboardHeader />
-        <MetricsCards cities={mockCities} />
+    <SidebarProvider>
+      {/* Aqui a AppSidebar é renderizada diretamente dentro do SidebarProvider */}
+      <AppSidebar/> 
 
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="overview">Visão Geral</TabsTrigger>
-            <TabsTrigger value="cities">Cidades</TabsTrigger>
-            <TabsTrigger value="analytics">Análises</TabsTrigger>
-          </TabsList>
+      <SidebarInset className="p-3">
 
-          <TabsContent value="overview" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <RegionChart data={regionData} />
-              <BarrierTypeChart data={barrierTypeData} />
-            </div>
-            <MonthlyChart data={monthlyData} />
-          </TabsContent>
+      {/* Todo o conteúdo principal da página deve ser encapsulado por SidebarInset */}
+             <SidebarTrigger>
+                <PanelLeftIcon />
+             </SidebarTrigger>
+        <div className="max-w mx-8 space-y-6">
+          {/* Adicione um trigger para a sidebar, se quiser que ela possa ser recolhida/expandida */}
+          {/* Você pode posicionar este trigger no cabeçalho ou onde fizer mais sentido */}
+             <DashboardHeader />
 
-          <TabsContent value="cities" className="space-y-6">
-            <FilterSection
-              searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
-              selectedRegion={selectedRegion}
-              setSelectedRegion={setSelectedRegion}
-              selectedStatus={selectedStatus}
-              setSelectedStatus={setSelectedStatus}
-              selectedPopulation={selectedPopulation}
-              setSelectedPopulation={setSelectedPopulation}
-              selectedDateRange={selectedDateRange}
-              setSelectedDateRange={setSelectedDateRange}
-              selectedBarrierLevel={selectedBarrierLevel}
-              setSelectedBarrierLevel={setSelectedBarrierLevel}
-              clearFilters={clearFilters}
-              filteredCount={filteredCities.length}
-              totalCount={mockCities.length}
-            />
+          <MetricsCards cities={mockCities} />
 
-            <CitiesTable
-              cities={filteredCities}
-              selectedCities={selectedCities}
-              onCitySelection={handleCitySelection}
-              onSelectAll={handleSelectAll}
-              totalCount={mockCities.length}
-            />
+          <Tabs defaultValue="overview" className="space-y-6">
+            <TabsList>
+              <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+              <TabsTrigger value="cities">Cidades</TabsTrigger>
+              <TabsTrigger value="analytics">Análises</TabsTrigger>
+            </TabsList>
 
-            <ComparisonBar
-              selectedCities={selectedCities}
-              cities={mockCities}
-              onCompare={() => setShowComparison(true)}
-              onClear={clearSelection}
-            />
+            <TabsContent value="overview" className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <RegionChart data={regionData} />
+                <BarrierTypeChart data={barrierTypeData} />
+              </div>
+              <MonthlyChart data={monthlyData} />
+            </TabsContent>
 
-            <ComparisonModal open={showComparison} onOpenChange={setShowComparison} cities={getSelectedCitiesData()} />
-          </TabsContent>
+            <TabsContent value="cities" className="space-y-6">
+              <FilterSection
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                selectedRegion={selectedRegion}
+                setSelectedRegion={setSelectedRegion}
+                selectedStatus={selectedStatus}
+                setSelectedStatus={setSelectedStatus}
+                selectedPopulation={selectedPopulation}
+                setSelectedPopulation={setSelectedPopulation}
+                selectedDateRange={selectedDateRange}
+                setSelectedDateRange={setSelectedDateRange}
+                selectedBarrierLevel={selectedBarrierLevel}
+                setSelectedBarrierLevel={setSelectedBarrierLevel}
+                clearFilters={clearFilters}
+                filteredCount={filteredCities.length}
+                totalCount={mockCities.length}
+              />
 
-          <TabsContent value="analytics" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Ranking de Regiões e Estatísticas podem ser componentizados também */}
-              {/* Por brevidade, mantendo inline aqui */}
-            </div>
-          </TabsContent>
-        </Tabs>
-      </div>
-    </div>
+              <CitiesTable
+                cities={filteredCities}
+                selectedCities={selectedCities}
+                onCitySelection={handleCitySelection}
+                onSelectAll={handleSelectAll}
+                totalCount={mockCities.length}
+              />
+
+              <ComparisonBar
+                selectedCities={selectedCities}
+                cities={mockCities}
+                onCompare={() => setShowComparison(true)}
+                onClear={clearSelection}
+              />
+
+              <ComparisonModal open={showComparison} onOpenChange={setShowComparison} cities={getSelectedCitiesData()} />
+            </TabsContent>
+
+            <TabsContent value="analytics" className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Ranking de Regiões e Estatísticas podem ser componentizados também */}
+                {/* Por brevidade, mantendo inline aqui */}
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }
