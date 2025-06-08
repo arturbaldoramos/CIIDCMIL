@@ -40,7 +40,7 @@ export function LoginForm({
 }: React.ComponentProps<"div">) {
   const [alertMessage, setAlertMessage] = useState<{ type: "error" | null; message: string | null } | null>(null)
   const { openModal } = useVerification();
-  const navigate = useNavigate(); // Passo 2: Instancie o hook
+  const navigate = useNavigate();
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(LoginFormSchema),
@@ -73,7 +73,6 @@ export function LoginForm({
         return; // Interrompe a execução aqui em caso de erro
       }
 
-      // --- Bloco de Sucesso Corrigido ---
       if (data.accessToken) {
         localStorage.setItem("accessToken", data.accessToken);
         
