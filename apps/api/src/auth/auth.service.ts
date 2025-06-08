@@ -16,6 +16,59 @@ export class AuthService {
     private jwtService: JwtService,
   ) { }
 
+  private async generateTokens(userId: number, email: string) {
+    const accessToken = this.jwtService.sign(
+      { sub: userId, email },
+      {
+        secret: this.configService.get<string>('JWT_SECRET'),
+        expiresIn: '15m', // Access token de curta duração
+      },
+    );
+
+    const refreshToken = this.jwtService.sign(
+      { sub: userId, email },
+      {
+        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+        expiresIn: '7d', // Refresh token de longa duração
+      },
+    );
+
+    return { accessToken, refreshToken };
+  }
+
+  private async updateRefreshToken(userId: number, refreshToken: string) {
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { refreshToken: hashedRefreshToken },
+    });
+  }
+
+  async refreshToken(token: string) {
+    if (!token) {
+      throw new Error('Refresh token não encontrado', { cause: { statusCode: HttpStatus.UNAUTHORIZED } });
+    }
+
+    try {
+      const payload = this.jwtService.verify(token, {
+        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+      });
+
+      const user = await this.prisma.user.findUnique({ where: { id: payload.sub } });
+      if (!user || !user.refreshToken) throw new Error('Acesso Negado');
+
+      const refreshTokenMatches = await bcrypt.compare(token, user.refreshToken);
+      if (!refreshTokenMatches) throw new Error('Acesso Negado');
+
+      const tokens = await this.generateTokens(user.id, user.email);
+      await this.updateRefreshToken(user.id, tokens.refreshToken);
+
+      return tokens;
+    } catch (e) {
+      throw new Error('Refresh token inválido ou expirado', { cause: { statusCode: HttpStatus.FORBIDDEN } });
+    }
+  }
+
   async login(dto: LoginDto) {
     const { email, password } = dto
 
@@ -61,17 +114,15 @@ export class AuthService {
       throw new Error('Sua conta foi suspensa. Contate o suporte.', {
         cause: { statusCode: HttpStatus.FORBIDDEN }
       });
-    } 
+    }
 
     // Gerar token JWT para autenticação
-    const payload = {
-      userId: user.id,
-    }
-    const accessToken = this.jwtService.sign(payload)
+    const tokens = await this.generateTokens(user.id, user.email);
+    await this.updateRefreshToken(user.id, tokens.refreshToken);
 
     return {
       message: "Login realizado com sucesso",
-      accessToken,
+      tokens,
     }
   }
 
@@ -172,4 +223,19 @@ export class AuthService {
 
     return { userId };
   }
+
+    async logout(userId: number) {
+    await this.prisma.user.updateMany({
+      where: {
+        id: userId,
+        refreshToken: {
+          not: null,
+        },
+      },
+      data: {
+        refreshToken: null,
+      },
+    });
+  }
+
 }
