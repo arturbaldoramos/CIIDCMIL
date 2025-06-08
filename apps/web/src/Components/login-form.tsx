@@ -169,11 +169,11 @@ export function LoginForm({
             </form>
           </Form>
 
-          <div className="bg-muted relative hidden md:block">
+          <div className="bg-muted relative hidden md:block ">
             <img
               src="/logo_proto.svg"
               alt="Image"
-              className="absolute inset-0 h-full w-full object-cover dark:opacity-50 dark:grayscale"
+              className="absolute inset-0 h-full w-full object-cover"
             />
           </div>
 
