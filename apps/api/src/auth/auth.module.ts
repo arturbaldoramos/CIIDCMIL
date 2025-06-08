@@ -5,10 +5,13 @@ import { ConfigService } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { PrismaModule } from 'prisma/prisma.module';
 import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
     imports: [
         PrismaModule,
+        PassportModule.register({ defaultStrategy: 'jwt' }), // 3. Registre o PassportModule
         JwtModule.registerAsync({
             useFactory: (configService: ConfigService) => ({
                 secret: configService.get<string>('JWT_SECRET'),
@@ -35,6 +38,6 @@ import { JwtModule } from '@nestjs/jwt';
         }),
     ],
     controllers: [AuthController],
-    providers: [AuthService,],
+    providers: [AuthService, JwtStrategy],
 })
 export class AuthModule { }

@@ -3,13 +3,11 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-
 import { cn } from "@/lib/utils"
 import { Button } from "@/Components/ui/button"
 import { Card, CardContent } from "@/Components/ui/card"
 import { Input } from "@/Components/ui/input"
-
-import { Alert, AlertDescription, AlertTitle } from "@/Components/ui/alert"
+import { Alert, AlertDescription } from "@/Components/ui/alert"
 import {
   Form,
   FormControl,
@@ -21,6 +19,7 @@ import {
 
 import { ExclamationTriangleIcon, CheckCircledIcon } from "@radix-ui/react-icons"
 import { useState } from "react"
+import { useNavigate } from "react-router"
 
 
 // Schema de Validação com Zod
@@ -41,6 +40,7 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const [alertMessage, setAlertMessage] = useState<{ type: "success" | "error" | null; message: string | null } | null>(null)
+  const navigate = useNavigate()
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(LoginFormSchema),
@@ -60,22 +60,21 @@ export function LoginForm({
         body: JSON.stringify(values),
       })
 
+      const data = await response.json()
+
       if (!response.ok) {
-        const errorData = await response.json()
-        // Define o alerta de erro
-        setAlertMessage({ type: "error", message: errorData.message || "Ocorreu um erro inesperado ao tentar fazer login." });
-        return; // Retorna para não continuar no fluxo de sucesso
+        setAlertMessage({ type: "error", message: data.message || "Ocorreu um erro inesperado ao tentar fazer login." });
+        return;
       }
 
-      // Se a resposta for OK, define o alerta de sucesso
-      const data = await response.json()
-      setAlertMessage({ type: "success", message: "Login realizado com sucesso!" });
-
-      // Limpa os campos de email e senha após o login bem-sucedido
-      form.reset({
-        email: "",
-        password: "",
-      });
+      if (data.accessToken) {
+        form.reset({ email: "", password: "" });
+        localStorage.setItem("accessToken", data.accessToken);
+        setAlertMessage({ type: "success", message: "Login realizado com sucesso!" });
+        navigate("/dashboard"); // Redireciona para a página do dashboard
+      } else {
+        setAlertMessage({ type: "error", message: "Token de acesso não recebido. Tente novamente." });
+      }
 
     } catch (error: any) {
       // Este catch pegará erros de rede ou outros erros que não vêm da resposta da API
