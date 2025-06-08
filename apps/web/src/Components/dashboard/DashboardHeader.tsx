@@ -2,7 +2,6 @@ import { Button } from "@/Components/ui/button"
 import { MenuIcon, Plus } from "lucide-react"
 import { SidebarTrigger } from "../ui/sidebar"
 import { Separator } from "../ui/separator"
-import { userInfo } from "node:os"
 
 export const DashboardHeader = () => {
   return (

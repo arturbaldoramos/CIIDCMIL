@@ -29,7 +29,9 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/Components/ui/sidebar"
-import path from "path"
+import api from "@/lib/api"
+import { useNavigate } from "react-router-dom"
+
 
 export function NavUser({
   user,
@@ -40,7 +42,19 @@ export function NavUser({
     avatar: string
   }
 }) {
+
   const { isMobile } = useSidebar()
+  const navigate = useNavigate(); // Passo 2: Instancie o hook
+
+  const handleLogout = async () => {
+    try {
+      await api.post('/auth/logout', {});
+      navigate("/dashboard");
+      localStorage.removeItem('accessToken');
+    } catch (error) {
+      console.log(error)
+    };
+  }
 
   return (
     <SidebarMenu>
@@ -103,7 +117,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
               <LogOut />
               Log out
             </DropdownMenuItem>
