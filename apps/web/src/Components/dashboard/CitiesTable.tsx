@@ -64,7 +64,7 @@ export const CitiesTable = ({ cities, selectedCities, onCitySelection, onSelectA
                   <Checkbox
                     checked={selectedCities.includes(city.id)}
                     onCheckedChange={(checked) => onCitySelection(city.id, checked as boolean)}
-                  />
+                    />
                 </TableCell>
                 <TableCell className="font-medium">
                   <div>

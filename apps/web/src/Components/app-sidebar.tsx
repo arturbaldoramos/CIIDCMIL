@@ -121,6 +121,18 @@ const data = {
                     icon: Command, // Added missing 'icon' property
                 },
             ],
+        }, 
+    ],
+    navSecondary: [
+        {
+            title: "Supporte",
+            url: "#",
+            icon: LifeBuoy,
+        },
+        {
+            title: "Feedback",
+            url: "#",
+            icon: Send,
         },
         {
             title: "Settings",
@@ -129,7 +141,7 @@ const data = {
             items: [
                 {
                     title: "General",
-                    url: "#",
+                    url: "#/settings",
                     icon: Command, // Added missing 'icon' property
                 },
                 {
@@ -148,18 +160,6 @@ const data = {
                     icon: Command, // Added missing 'icon' property
                 },
             ],
-        },
-    ],
-    navSecondary: [
-        {
-            title: "Support",
-            url: "#",
-            icon: LifeBuoy,
-        },
-        {
-            title: "Feedback",
-            url: "#",
-            icon: Send,
         },
     ],
     projects: [
