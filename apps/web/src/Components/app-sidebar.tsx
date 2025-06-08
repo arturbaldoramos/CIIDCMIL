@@ -4,22 +4,14 @@ import * as React from "react"
 import {
     BookIcon,
     BookOpen,
-    Bot,
-    ChartBar,
-    ChartBarIcon,
-    ChartBarStacked,
     ChartLine,
     Command, // Import Command for default icon
     Frame,
-    GitGraph,
-    Icon,
-    icons,
     LifeBuoy,
     Map,
     PieChart,
     Send,
     Settings2,
-    SquareTerminal,
     TagIcon,
     User2Icon,
     UserCheck2,
@@ -37,7 +29,7 @@ import {
     SidebarFooter,
     SidebarGroupLabel,
     SidebarHeader,
-    SidebarMenu,
+    SidebarMenu
     SidebarMenuButton,
     SidebarMenuItem,
     SidebarSeparator,
@@ -136,7 +128,7 @@ const data = {
         },
         {
             title: "Settings",
-            url: "#",
+            url: "#/settings",
             icon: Settings2,
             items: [
                 {

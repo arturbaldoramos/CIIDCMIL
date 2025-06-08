@@ -1,3 +1,4 @@
+// src/Components/nav-user.tsx (Updated)
 "use client"
 
 import {
@@ -44,7 +45,7 @@ export function NavUser({
 }) {
 
   const { isMobile } = useSidebar()
-  const navigate = useNavigate(); // Passo 2: Instancie o hook
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
@@ -54,6 +55,10 @@ export function NavUser({
     } catch (error) {
       console.log(error)
     };
+  }
+
+  const handleAccountClick = () => {
+    navigate("/settings"); // Navigate to the new settings page
   }
 
   return (
@@ -103,7 +108,7 @@ export function NavUser({
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={handleAccountClick}>
                 <BadgeCheck />
                 Account
               </DropdownMenuItem>
