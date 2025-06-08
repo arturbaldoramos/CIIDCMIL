@@ -1,6 +1,6 @@
 "use client"
 
-import { ChevronRight, type LucideIcon, type LucideProps } from "lucide-react"
+import { ChevronRight, type LucideIcon } from "lucide-react"
 
 import {
     Collapsible,
@@ -31,7 +31,6 @@ export function NavMain({
             title: string
             url: string
             icon: LucideIcon
-            
         }[]
     }[]
 }) {
@@ -42,23 +41,28 @@ export function NavMain({
                 {items.map((item) => (
                     <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
                         <SidebarMenuItem>
-                            <SidebarMenuButton asChild tooltip={item.title}>
-                                <a href={item.url}>
-                                    <item.icon />
-                                    <span>{item.title}</span>
-                                </a>
-                            </SidebarMenuButton>
                             {item.items?.length ? (
                                 <>
+                                    <CollapsibleTrigger className="flex-1" asChild>
+                                        <SidebarMenuButton asChild tooltip={item.title}>
+                                            <button type="button" className="w-full">
+                                                <item.icon />
+                                                <span>{item.title}</span>
+                                            </button>
+                                        </SidebarMenuButton>
+                                    </CollapsibleTrigger>
+
                                     <CollapsibleTrigger asChild>
-                                        <SidebarMenuAction className="data-[state=open]:rotate-90">
+                                        {/* A classe "hover:bg-transparent" foi adicionada aqui */}
+                                        <SidebarMenuAction className="data-[state=open]:rotate-90 hover:bg-transparent">
                                             <ChevronRight />
                                             <span className="sr-only">Toggle</span>
                                         </SidebarMenuAction>
                                     </CollapsibleTrigger>
+
                                     <CollapsibleContent>
                                         <SidebarMenuSub>
-                                            {item.items?.map((subItem) => (
+                                            {item.items.map((subItem) => (
                                                 <SidebarMenuSubItem key={subItem.title}>
                                                     <SidebarMenuSubButton asChild>
                                                         <a href={subItem.url}>
@@ -71,7 +75,14 @@ export function NavMain({
                                         </SidebarMenuSub>
                                     </CollapsibleContent>
                                 </>
-                            ) : null}
+                            ) : (
+                                <SidebarMenuButton asChild tooltip={item.title}>
+                                    <a href={item.url}>
+                                        <item.icon />
+                                        <span>{item.title}</span>
+                                    </a>
+                                </SidebarMenuButton>
+                            )}
                         </SidebarMenuItem>
                     </Collapsible>
                 ))}

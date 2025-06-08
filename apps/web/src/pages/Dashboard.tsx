@@ -66,7 +66,7 @@ export const Dashboard = () => {
           <DashboardHeader />
           <MetricsCards cities={mockCities} />
 
-          <Tabs defaultValue="overview" className="space-y-6">
+          <Tabs defaultValue="overview" className="space-y-6 ">
             <TabsList>
               <TabsTrigger value="overview">Visão Geral</TabsTrigger>
               <TabsTrigger value="cities">Cidades</TabsTrigger>
