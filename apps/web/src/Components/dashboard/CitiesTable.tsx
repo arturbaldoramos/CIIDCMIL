@@ -10,7 +10,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/Components/ui/card"
 import { Badge } from "@/Components/ui/badge"
 import { TableBody, TableCell, TableHead, TableHeader, TableRow, Table } from "@/Components/ui/table"
-import { Checkbox } from "@radix-ui/react-checkbox"
+import { Checkbox } from "@/Components/ui/checkbox"
 
 interface CitiesTableProps {
   cities: City[]
