@@ -1,12 +1,12 @@
 import axios from 'axios';
 
-const API_URL = '/api';
-
 const api = axios.create({
-  baseURL: API_URL,
+  baseURL: '/api',
+  withCredentials: true, // ESSENCIAL para enviar e receber cookies
 });
 
-// Interceptor de REQUISIÇÃO (adiciona o token)
+
+// Interceptor de Requisição (continua o mesmo)
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('accessToken');
@@ -15,32 +15,30 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
+// Interceptor de Resposta (Lógica de Refresh)
 api.interceptors.response.use(
-  // A primeira função lida com respostas de sucesso, apenas as repassa
-  (response) => {
-    return response;
-  },
-  // A segunda função lida com erros
-  (error) => {
-    // Verifica se o erro é 401 (Não Autorizado)
-    if (error.response && error.response.status === 401) {
-      // Limpa o token inválido/expirado
-      localStorage.removeItem('accessToken');
-      
-      // Redireciona o usuário para a página de login
-      // Usamos window.location para garantir o redirecionamento mesmo fora de um componente React
-      window.location.href = '/login';
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    if (error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      try {
+        // O corpo da requisição agora é vazio, pois o cookie é enviado automaticamente
+        const { data } = await api.post('/auth/refresh'); 
+        localStorage.setItem('accessToken', data.accessToken);
+        api.defaults.headers.common['Authorization'] = 'Bearer ' + data.accessToken;
+        return api(originalRequest);
+      } catch (refreshError) {
+        localStorage.removeItem('accessToken');
+        window.location.href = '/login';
+        return Promise.reject(refreshError);
+      }
     }
-
-    // Para outros erros, apenas rejeita a promise para que possam ser tratados localmente
     return Promise.reject(error);
   }
 );
-
 
 export default api;
