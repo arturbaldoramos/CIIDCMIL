@@ -93,7 +93,7 @@ export class AuthService {
 
     // Verificar se o email foi verificado
     if (!user.emailVerified) {
-      throw new Error("Email não verificado. Verifique sua caixa de entrada.", {
+      throw new Error("EMAIL_NOT_VERIFIED", {
         cause: { statusCode: HttpStatus.FORBIDDEN },
       })
     }
@@ -138,12 +138,23 @@ export class AuthService {
     // Hash da senha
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Gerar um código de 6 dígitos
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Definir tempo de expiração (ex: 10 minutos)
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    // Hashear o código antes de salvar no banco (IMPORTANTE!)
+    const hashedVerificationCode = await bcrypt.hash(verificationCode, 10);
+
     // Criar usuário inativo
     const user = await this.prisma.user.create({
       data: {
         email,
         name,
         password: hashedPassword,
+        emailVerificationCode: hashedVerificationCode,
+        emailVerificationCodeExpiresAt: expiresAt,
       },
     });
 
@@ -155,37 +166,12 @@ export class AuthService {
     await this.mailerService.sendMail({
       to: email,
       from: this.configService.get<string>('MAILER_USER'),
-      subject: 'Confirmação de Registro',
+      subject: 'Seu Código de Verificação',
 
       html: `
-        <!DOCTYPE html>
-        <html lang="pt-BR">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Verificação de E-mail</title>
-          <style type="text/css">
-          .button:hover { background-color: #1557b0; }
-        </style>
-        </head>
-        <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
-          <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
-            <div style="background-color: #1a73e8; color: #ffffff; text-align: center; padding: 10px 0; border-radius: 8px 8px 0 0;">
-              <h2>Verificação de E-mail</h2>
-            </div>
-            <div style="padding: 20px; text-align: center;">
-              <p style="font-size: 16px; color: #333333;">Olá! ${name},</p>
-              <p style="font-size: 16px; color: #333333;">Obrigado por se registrar! Seu e-mail precisa ser verificado antes que possamos prosseguir com a aprovação do seu cadastro. Clique no botão abaixo para confirmar seu endereço de e-mail:</p>
-              <a href="http://localhost:5173/verify-email?token=${token}" class="button" style="display: inline-block; padding: 12px 25px; background-color: #1a73e8; color: #ffffff; text-decoration: none; border-radius: 5px; font-size: 16px; margin-top: 20px;">Verificar E-mail Agora</a>
-              <p style="font-size: 14px; color: #333333; margin-top: 20px;">Se você não solicitou este registro, por favor, ignore este e-mail.</p>
-            </div>
-            <div style="text-align: center; font-size: 12px; color: #777777; margin-top: 20px;">
-              <p>Este é um e-mail automático. Por favor, não responda diretamente.</p>
-              <p>© ${new Date().getFullYear()} CIIDCMIL. Todos os direitos reservados.</p>
-            </div>
-          </div>
-        </body>
-        </html>
+        <p>Olá, ${name}!</p>
+        <p>Seu código de verificação é: <strong>${verificationCode}</strong></p>
+        <p>Este código expira em 10 minutos.</p>
       `,
     });
 
@@ -193,38 +179,77 @@ export class AuthService {
 
   }
 
-  async verifyEmail(token: string) {
-    // Verificar o token com JWT
-    let payload;
-    try {
-      payload = this.jwtService.verify(token);
-    } catch (error) {
-      throw new Error('Token de verificação inválido ou expirado');
+  async verifyEmailWithCode(email: string, code: string) {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+
+    if (!user) {
+      throw new Error('Usuário não encontrado.', { cause: { statusCode: HttpStatus.NOT_FOUND } });
     }
-
-    const { userId, email } = payload;
-
-    // Verificar se o usuário existe e se o e-mail ainda é o mesmo
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!user || user.email !== email) {
-      throw new Error('Usuário ou e-mail inválido');
-    }
-
-    // Verificar se o e-mail já foi verificado (evita reuso do token)
     if (user.emailVerified) {
-      throw new Error('E-mail já foi verificado');
+      return { message: 'Este e-mail já foi verificado.' };
+    }
+    if (!user.emailVerificationCode || !user.emailVerificationCodeExpiresAt) {
+      throw new Error('Nenhum código de verificação pendente.', { cause: { statusCode: HttpStatus.BAD_REQUEST } });
+    }
+    if (new Date() > user.emailVerificationCodeExpiresAt) {
+      // Opcional: Limpar o código expirado
+      await this.prisma.user.update({ where: { email }, data: { emailVerificationCode: null, emailVerificationCodeExpiresAt: null } });
+      throw new Error('Código de verificação expirado.', { cause: { statusCode: HttpStatus.BAD_REQUEST } });
     }
 
-    // Marcar o e-mail como verificado
+    const isCodeValid = await bcrypt.compare(code, user.emailVerificationCode);
+
+    if (!isCodeValid) {
+      throw new Error('Código de verificação inválido.', { cause: { statusCode: HttpStatus.BAD_REQUEST } });
+    }
+
+    // Sucesso! Ativa o usuário e limpa os campos de verificação
     await this.prisma.user.update({
-      where: { id: userId },
-      data: { emailVerified: true },
+      where: { email },
+      data: {
+        emailVerified: true,
+        emailVerificationCode: null,
+        emailVerificationCodeExpiresAt: null,
+      },
     });
 
-    return { userId };
+    return { message: 'E-mail verificado com sucesso. Aguardando aprovação do admin.' };
   }
 
-    async logout(userId: number) {
+  async resendVerificationCode(email: string) {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+
+    if (!user) {
+      throw new Error('Se este e-mail estiver registrado, um código foi enviado.', { cause: { statusCode: HttpStatus.OK } });
+    }
+    if (user.emailVerified) {
+      throw new Error('Este e-mail já foi verificado.', { cause: { statusCode: HttpStatus.BAD_REQUEST } });
+    }
+
+    // Gera e salva um novo código e expiração
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // +10 minutos
+    const hashedVerificationCode = await bcrypt.hash(verificationCode, 10);
+
+    await this.prisma.user.update({
+      where: { email },
+      data: {
+        emailVerificationCode: hashedVerificationCode,
+        emailVerificationCodeExpiresAt: expiresAt,
+      },
+    });
+
+    // Reenvia o e-mail
+    await this.mailerService.sendMail({
+      to: email,
+      subject: 'Seu Novo Código de Verificação',
+      html: `<p>Seu novo código de verificação é: <strong>${verificationCode}</strong></p>`,
+    });
+
+    return { message: 'Se um conta com este e-mail existir, um novo código foi enviado.' };
+  }
+
+  async logout(userId: number) {
     await this.prisma.user.updateMany({
       where: {
         id: userId,

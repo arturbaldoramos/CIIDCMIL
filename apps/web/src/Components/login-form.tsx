@@ -19,7 +19,7 @@ import {
 
 import { ExclamationTriangleIcon, CheckCircledIcon } from "@radix-ui/react-icons"
 import { useState } from "react"
-import { useNavigate } from "react-router"
+import { useVerification } from "@/context/VerificationProvider"
 
 
 // Schema de Validação com Zod
@@ -40,7 +40,7 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const [alertMessage, setAlertMessage] = useState<{ type: "success" | "error" | null; message: string | null } | null>(null)
-  const navigate = useNavigate()
+  const { openModal } = useVerification();
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(LoginFormSchema),
@@ -63,15 +63,22 @@ export function LoginForm({
       const data = await response.json()
 
       if (!response.ok) {
-        setAlertMessage({ type: "error", message: data.message || "Ocorreu um erro inesperado ao tentar fazer login." });
-        return;
+        if (data.message === 'EMAIL_NOT_VERIFIED') {
+          // Se o erro for de email não verificado, abra o dialog!
+          openModal(values.email);
+          return;
+        } else {
+          setAlertMessage({ type: "error", message: data.message || "Ocorreu um erro inesperado ao tentar fazer login." });
+          return;
+        }
+
       }
 
       if (data.accessToken) {
         form.reset({ email: "", password: "" });
         localStorage.setItem("accessToken", data.accessToken);
         setAlertMessage({ type: "success", message: "Login realizado com sucesso!" });
-        navigate("/dashboard"); // Redireciona para a página do dashboard
+        //navigate("/dashboard"); // Redireciona para a página do dashboard
       } else {
         setAlertMessage({ type: "error", message: "Token de acesso não recebido. Tente novamente." });
       }

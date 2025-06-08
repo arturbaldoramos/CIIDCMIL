@@ -15,7 +15,11 @@ export default defineConfig({
     host: '0.0.0.0', // Permite acesso de qualquer interface de rede (incluindo IP local)
     port: 5173, // Porta padrão do Vite
     proxy: {
-      '/api': 'http://localhost:3000',
+      '/api': {
+        target: 'http://localhost:3000', // O alvo da requisição
+        changeOrigin: true, // Necessário para o proxy funcionar corretamente
+        rewrite: (path) => path.replace(/^\/api/, ''), // Remove o /api do início da URL
+      },
     },
   },
 })

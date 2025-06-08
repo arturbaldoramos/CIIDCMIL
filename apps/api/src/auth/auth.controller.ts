@@ -6,13 +6,15 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { VerifyEmailDto } from './dtos/verify-email.dto';
+import { Throttle } from '@nestjs/throttler';
 
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
-    private jwtService: JwtService, // Corrigido: Injetado corretamente
+    private jwtService: JwtService,
     private configService: ConfigService, // Adicionado para usar no cookie
   ) { }
 
@@ -78,13 +80,28 @@ export class AuthController {
     }
   }
 
-  @Get('verify-email')
-  async verifyEmail(@Query('token') token: string) {
+  @Post('verify-email')
+  @HttpCode(HttpStatus.OK)
+  async verifyEmailWithCode(@Body() dto: VerifyEmailDto) {
     try {
-      const verification = await this.authService.verifyEmail(token);
-      return { message: 'E-mail verificado com sucesso. Aguardando aprovação do admin.', ...verification };
+      return await this.authService.verifyEmailWithCode(dto.email, dto.code);
     } catch (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+      throw new HttpException(error.message, error.cause?.statusCode || HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Throttle({ default: { limit: 1, ttl: 60000 } })
+  @Post('resend-code')
+  @HttpCode(HttpStatus.OK)
+  async resendCode(@Body('email') email: string) {
+    try {
+      return await this.authService.resendVerificationCode(email);
+    } catch (error) {
+      // Mesmo em caso de erro, retornamos uma mensagem genérica para não revelar se um email existe ou não
+      if (error.status !== HttpStatus.BAD_REQUEST) {
+        return { message: 'Se um conta com este e-mail existir, um novo código foi enviado.' };
+      }
+      throw new HttpException(error.message, error.status);
     }
   }
 
@@ -92,7 +109,6 @@ export class AuthController {
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   async logout(@Req() req, @Res({ passthrough: true }) res: Response) {
-    // O guard já validou o usuário. Agora invalidamos o refresh token.
     await this.authService.logout(req.user.userId);
     res.clearCookie('refreshToken');
     return { message: 'Logout realizado com sucesso.' };
@@ -101,8 +117,6 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('status')
   checkAuthStatus(@Req() req) {
-    // Se chegou até aqui, o JwtAuthGuard validou o accessToken.
-    // Retornamos o usuário que o guard anexou à requisição.
     return { user: req.user };
   }
 

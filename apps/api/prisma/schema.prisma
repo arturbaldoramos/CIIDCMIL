@@ -16,10 +16,12 @@ model User {
   status        Status  @default(PENDING)
   emailVerified Boolean @default(false)
 
-  refreshToken  String?  @unique // Adicione este campo
+  refreshToken                   String?   @unique
+  emailVerificationCode          String?
+  emailVerificationCodeExpiresAt DateTime?
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum Role {
