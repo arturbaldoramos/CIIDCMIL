@@ -5,7 +5,7 @@ import { Separator } from "../ui/separator"
 
 export const DashboardHeader = () => {
   return (
-    <div className="flex sticky top-0 pt-2 items-center justify-between pb-4 border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md z-10">
+    <div className="flex sticky top-0 pt-2 items-center justify-between pb-4 border-b backdrop-blur-md z-10">
       <div className="flex justify-start items-center">
         <SidebarTrigger>
           <MenuIcon />
