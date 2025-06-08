@@ -13,7 +13,6 @@ interface ComparisonBarProps {
 }
 
 export const ComparisonBar = ({ selectedCities, cities, onCompare, onClear }: ComparisonBarProps) => {
-  if (selectedCities.length === 0) return null
 
   const selectedCitiesData = cities.filter((city) => selectedCities.includes(city.id))
 
