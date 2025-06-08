@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import { useNavigate } from "react-router-dom" // Passo 1: Importe o hook
 import { cn } from "@/lib/utils"
 import { Button } from "@/Components/ui/button"
 import { Card, CardContent } from "@/Components/ui/card"
@@ -17,12 +18,11 @@ import {
   FormMessage,
 } from "@/Components/ui/form"
 
-import { ExclamationTriangleIcon, CheckCircledIcon } from "@radix-ui/react-icons"
+import { ExclamationTriangleIcon } from "@radix-ui/react-icons"
 import { useState } from "react"
 import { useVerification } from "@/context/VerificationProvider"
 
 
-// Schema de Validação com Zod
 const LoginFormSchema = z.object({
   email: z.string().email({
     message: "Por favor, insira um email válido.",
@@ -32,15 +32,15 @@ const LoginFormSchema = z.object({
   }),
 })
 
-// Defina os tipos de dados esperados para o formulário
 type LoginFormValues = z.infer<typeof LoginFormSchema>
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [alertMessage, setAlertMessage] = useState<{ type: "success" | "error" | null; message: string | null } | null>(null)
+  const [alertMessage, setAlertMessage] = useState<{ type: "error" | null; message: string | null } | null>(null)
   const { openModal } = useVerification();
+  const navigate = useNavigate(); // Passo 2: Instancie o hook
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(LoginFormSchema),
@@ -51,40 +51,39 @@ export function LoginForm({
   })
 
   const onSubmit = async (values: LoginFormValues) => {
+    setAlertMessage(null); // Limpa alertas antigos ao submeter
     try {
+      // Usando o cliente Axios global que configuramos
       const response = await fetch("http://localhost:3000/auth/login", {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         },
         body: JSON.stringify(values),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok) {
         if (data.message === 'EMAIL_NOT_VERIFIED') {
-          // Se o erro for de email não verificado, abra o dialog!
           openModal(values.email);
-          return;
         } else {
-          setAlertMessage({ type: "error", message: data.message || "Ocorreu um erro inesperado ao tentar fazer login." });
-          return;
+          setAlertMessage({ type: "error", message: data.message || "Ocorreu um erro inesperado." });
         }
-
+        return; // Interrompe a execução aqui em caso de erro
       }
 
+      // --- Bloco de Sucesso Corrigido ---
       if (data.accessToken) {
-        form.reset({ email: "", password: "" });
         localStorage.setItem("accessToken", data.accessToken);
-        setAlertMessage({ type: "success", message: "Login realizado com sucesso!" });
-        //navigate("/dashboard"); // Redireciona para a página do dashboard
+        
+        navigate("/dashboard"); 
+
       } else {
         setAlertMessage({ type: "error", message: "Token de acesso não recebido. Tente novamente." });
       }
 
     } catch (error: any) {
-      // Este catch pegará erros de rede ou outros erros que não vêm da resposta da API
       console.error("Erro no login:", error.message)
       setAlertMessage({ type: "error", message: "Não foi possível conectar ao servidor. Tente novamente." })
     }
@@ -96,7 +95,6 @@ export function LoginForm({
         <CardContent className="grid p-0 md:grid-cols-2">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="p-6 md:p-8">
-
               <div className="flex flex-col gap-6">
                 <div className="flex flex-col items-center text-center">
                   <h1 className="text-2xl font-bold">Bem-vindo de volta</h1>
@@ -105,7 +103,6 @@ export function LoginForm({
                   </p>
                 </div>
 
-                {/* Campo de Email */}
                 <FormField
                   control={form.control}
                   name="email"
@@ -125,7 +122,6 @@ export function LoginForm({
                   )}
                 />
 
-                {/* Campo de Senha */}
                 <FormField
                   control={form.control}
                   name="password"
@@ -133,37 +129,29 @@ export function LoginForm({
                     <FormItem>
                       <div className="flex items-center">
                         <FormLabel htmlFor="password">Senha</FormLabel>
-                        <a
-                          href="#"
-                          className="ml-auto text-sm underline-offset-2 hover:underline"
-                        >
+                        <a href="#" className="ml-auto text-sm underline-offset-2 hover:underline">
                           Esqueceu sua senha?
                         </a>
                       </div>
                       <FormControl>
-                        <Input
-                          id="password"
-                          type="password"
-                          {...field}
-                        />
+                        <Input id="password" type="password" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                {/* Renderiza o Alert se houver uma mensagem */}
-                {alertMessage && (
-                  <Alert variant={alertMessage.type === "error" ? "destructive" : "default"}>
-                    {alertMessage.type === "error" ? <ExclamationTriangleIcon className="h-4 w-4" /> : <CheckCircledIcon className="h-4 w-4" />}
+                {alertMessage && alertMessage.type === 'error' && (
+                  <Alert variant="destructive">
+                    <ExclamationTriangleIcon className="h-4 w-4" />
                     <AlertDescription>
                       {alertMessage.message}
                     </AlertDescription>
                   </Alert>
                 )}
 
-                <Button type="submit" className="w-full">
-                  Entrar
+                <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+                  {form.formState.isSubmitting ? 'Entrando...' : 'Entrar'}
                 </Button>
                 <div className="text-center text-sm">
                   Não tem uma conta?{" "}
@@ -182,7 +170,6 @@ export function LoginForm({
               className="absolute inset-0 h-full w-full object-cover"
             />
           </div>
-
         </CardContent>
       </Card>
       <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
