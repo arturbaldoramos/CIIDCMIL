@@ -1,17 +1,27 @@
 import { Button } from "@/Components/ui/button"
-import { Plus } from "lucide-react"
+import { MenuIcon, Plus } from "lucide-react"
+import { SidebarTrigger } from "../ui/sidebar"
+import { Separator } from "../ui/separator"
 
 export const DashboardHeader = () => {
   return (
-    <div className="flex justify-between items-center">
-      <div>
+    <div className="flex sticky top-0 pt-2 items-center justify-between pb-4 border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md z-10">
+      <div className="flex justify-start items-center">
+        <SidebarTrigger>
+          <MenuIcon />
+        </SidebarTrigger>
+        <Separator
+          orientation="vertical"
+          className="mx-2 data-[orientation=vertical]:h-7"
+        />
         <h1 className="text-3xl font-bold">Painel de Administração</h1>
-        <p className="text-muted-foreground mt-1">Pesquisa sobre Barreiras em Sites de Prefeituras</p>
       </div>
-      <Button className="flex items-center gap-2">
-        <Plus className="h-4 w-4" />
-        Nova Cidade
-      </Button>
+      <div className="flex justify-end">
+        <Button className="flex items-center gap-2">
+          <Plus className="h-4 w-4" />
+          Nova Cidade
+        </Button>
+      </div>
     </div>
   )
 }

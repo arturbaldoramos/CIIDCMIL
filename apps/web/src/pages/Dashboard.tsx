@@ -1,7 +1,7 @@
 // Dashboard.tsx
 "use client"
 
-import AppSidebar from "@/Components/app-sidebar"
+import {AppSidebar} from "@/Components/app-sidebar"
 import { BarrierTypeChart } from "@/Components/charts/BarrierTypeChart"
 import { MonthlyChart } from "@/Components/charts/MontlhyChart"
 import { RegionChart } from "@/Components/charts/RegionChart"
@@ -11,12 +11,11 @@ import { ComparisonModal } from "@/Components/dashboard/ComparsionModal"
 import { DashboardHeader } from "@/Components/dashboard/DashboardHeader"
 import { FilterSection } from "@/Components/dashboard/FilterSection"
 import { MetricsCards } from "@/Components/dashboard/MetricCards"
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/Components/ui/sidebar" // Importe SidebarInset e SidebarTrigger
+import { SidebarProvider, SidebarInset } from "@/Components/ui/sidebar" // Importe SidebarInset e SidebarTrigger
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs"
 import { barrierTypeData, mockCities, monthlyData, regionData } from "@/data/MockData"
 import { useCityComparison } from "@/hooks/useCityComparsion"
 import { useCityFilters } from "@/hooks/useCityFilters"
-import { PanelLeftIcon } from "lucide-react" // Importe PanelLeftIcon para o SidebarTrigger
 
 
 export const Dashboard = () => {
@@ -50,19 +49,14 @@ export const Dashboard = () => {
   return (
     <SidebarProvider>
       {/* Aqui a AppSidebar é renderizada diretamente dentro do SidebarProvider */}
-      <AppSidebar/> 
-
+      <AppSidebar />
       <SidebarInset className="p-3">
 
-      {/* Todo o conteúdo principal da página deve ser encapsulado por SidebarInset */}
-             <SidebarTrigger>
-                <PanelLeftIcon />
-             </SidebarTrigger>
-        <div className="max-w mx-8 space-y-6">
+        {/* Todo o conteúdo principal da página deve ser encapsulado por SidebarInset */}
+        
+        <div className="max-w grow mx-8 space-y-6">
           {/* Adicione um trigger para a sidebar, se quiser que ela possa ser recolhida/expandida */}
-          {/* Você pode posicionar este trigger no cabeçalho ou onde fizer mais sentido */}
-             <DashboardHeader />
-
+          <DashboardHeader />
           <MetricsCards cities={mockCities} />
 
           <Tabs defaultValue="overview" className="space-y-6">
