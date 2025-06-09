@@ -1,11 +1,11 @@
 import { Injectable, HttpStatus } from '@nestjs/common';
-import { RegisterDto } from './dtos/register.dto';
 import * as bcrypt from 'bcrypt';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dtos/login.dto';
+import { RegisterDto } from './dtos/register.dto';
 
 @Injectable()
 export class AuthService {
@@ -157,10 +157,6 @@ export class AuthService {
         emailVerificationCodeExpiresAt: expiresAt,
       },
     });
-
-    // Gerar token de verificação com JWT
-    const payload = { userId: user.id, email };
-    const token = this.jwtService.sign(payload);
 
     // Enviar email de confirmação
     await this.mailerService.sendMail({

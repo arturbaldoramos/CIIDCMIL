@@ -1,6 +1,5 @@
 import { Controller, Post, Body, HttpException, HttpStatus, Get, Query, HttpCode, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { RegisterDto } from './dtos/register.dto';
 import { LoginDto } from './dtos/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -8,6 +7,7 @@ import { Request, Response } from 'express';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { VerifyEmailDto } from './dtos/verify-email.dto';
 import { Throttle } from '@nestjs/throttler';
+import { RegisterDto } from './dtos/register.dto';
 
 
 @Controller('auth')
