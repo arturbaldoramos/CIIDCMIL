@@ -11,7 +11,7 @@ import { VerificationDialog } from './Components/VerificationDialog';
 
 function App() {
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+    <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
       <VerificationProvider>
         <Router>
           <VerificationDialog />

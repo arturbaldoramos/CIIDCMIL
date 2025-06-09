@@ -11,7 +11,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 @Module({
     imports: [
         PrismaModule,
-        PassportModule.register({ defaultStrategy: 'jwt' }), // 3. Registre o PassportModule
+        PassportModule.register({ defaultStrategy: 'jwt' }),
         JwtModule.registerAsync({
             useFactory: (configService: ConfigService) => ({
                 secret: configService.get<string>('JWT_SECRET'),

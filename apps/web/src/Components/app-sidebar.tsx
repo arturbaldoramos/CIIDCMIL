@@ -29,7 +29,7 @@ import {
     SidebarFooter,
     SidebarGroupLabel,
     SidebarHeader,
-    SidebarMenu
+    SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
     SidebarSeparator,
