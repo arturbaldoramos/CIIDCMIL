@@ -2,11 +2,11 @@ import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/commo
 import { PrismaService } from 'prisma/prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
-import { User as UserModel } from '@prisma/client';
+import { Prisma, User as UserModel } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   // READ (All)
   async findAll() {
@@ -45,27 +45,35 @@ export class UsersService {
   async update(id: number, dto: UpdateUserDto, currentUser: Omit<UserModel, 'password'>) {
     // Apenas Admins podem alterar o 'role' ou 'status' de outros usuários
     if ((dto.role || dto.status) && currentUser.role !== 'ADMIN') {
-        throw new ForbiddenException('Apenas administradores podem alterar papéis e status.');
+      throw new ForbiddenException('Apenas administradores podem alterar papéis e status.');
     }
 
     // Usuários normais só podem editar seu próprio perfil
     if (currentUser.role !== 'ADMIN' && currentUser.id !== id) {
-        throw new ForbiddenException('Você não tem permissão para editar este usuário.');
+      throw new ForbiddenException('Você não tem permissão para editar este usuário.');
     }
 
     const userToUpdate = await this.prisma.user.findUnique({ where: { id } });
     if (!userToUpdate) {
       throw new NotFoundException('Usuário a ser atualizado não encontrado.');
     }
-    
+
+    // Prepara os dados para a atualização
+    const dataToUpdate: Prisma.UserUpdateInput = { ...dto };
+
     // Se uma nova senha for fornecida, faz o hash dela
     if (dto.password) {
-      dto.password = await bcrypt.hash(dto.password, 10);
+      dataToUpdate.password = await bcrypt.hash(dto.password, 10);
+    }
+
+    // NOVO: Lógica para invalidar a sessão se o status for alterado para SUSPENDED
+    if (dto.status === 'SUSPENDED') {
+      dataToUpdate.refreshToken = null;
     }
 
     return this.prisma.user.update({
       where: { id },
-      data: dto,
+      data: dataToUpdate, // Usa o objeto de dados preparado
       select: { id: true, email: true, name: true, role: true, status: true },
     });
   }
