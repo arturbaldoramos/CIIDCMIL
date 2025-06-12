@@ -6,12 +6,14 @@ import { PrismaService } from 'prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dtos/login.dto';
 import { RegisterDto } from './dtos/register.dto';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 
 @Injectable()
 export class AuthService {
   constructor(
+    @InjectQueue('email') private readonly emailQueue: Queue,
     private prisma: PrismaService,
-    private mailerService: MailerService,
     private configService: ConfigService,
     private jwtService: JwtService,
   ) { }
@@ -158,59 +160,21 @@ export class AuthService {
       },
     });
 
-    // Enviar email de confirmação
-    await this.mailerService.sendMail({
-      to: email,
-      from: this.configService.get<string>('MAILER_USER'),
-      subject: 'Seu Código de Verificação',
-
-      html: `
-    <!DOCTYPE html>
-    <html lang="pt-BR">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Seu Código de Verificação</title>
-    </head>
-    <body style="margin: 0; padding: 0; background-color: #f2f2f2; font-family: Arial, sans-serif;">
-      <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f2f2f2;">
-        <tr>
-          <td align="center">
-            <table width="100%" border="0" cellspacing="0" cellpadding="0" style="width: 100%; max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-              <tr>
-                <td align="center" style="padding: 30px 30px; font-family: Arial, sans-serif;">
-                  <h1 style="font-size: 28px; font-weight: bold; color: #333333; margin: 0;">Seja bem-vindo(a)!</h1>
-                </td>
-              </tr>
-              <tr>
-                <td align="center" style="padding: 10px 30px; font-family: Arial, sans-serif;">
-                  <p style="font-size: 16px; color: #666666; margin: 0;">Use o código de verificação abaixo para confirmar seu e-mail.</p>
-                </td>
-              </tr>
-              <tr>
-                <td align="center" style="padding: 20px 30px;">
-                  <div style="background-color: #f8f8f8; border: 1px solid #dddddd; border-radius: 8px; padding: 15px 20px; display: inline-block;">
-                    <p style="font-size: 32px; font-weight: bold; color: #333333; margin: 0; letter-spacing: 8px; font-family: 'Courier New', Courier, monospace;">
-                      ${verificationCode}
-                    </p>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td align="center" style="padding: 30px; font-family: Arial, sans-serif;">
-                  <p style="font-size: 12px; color: #999999; margin: 0;">
-                    Olá, ${name}! Você recebeu este e-mail porque uma verificação foi solicitada para sua conta. Caso essa solicitação não seja sua, pedimos que ignore este e-mail.
-                  </p>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-      </table>
-    </body>
-    </html>
-  `,
-    });
+    await this.emailQueue.add(
+      'send-verification-email', // Nome do job que o Processor irá ouvir
+      {
+        email: user.email,
+        name: user.name,
+        verificationCode: verificationCode, // Enviar o código não hasheado para o template
+      },
+      {
+        attempts: 3, // Tentar reenviar 3 vezes em caso de falha
+        backoff: {
+          type: 'exponential',
+          delay: 5000, // Esperar 5s antes da próxima tentativa
+        }
+      }
+    );
 
     return { message: 'Usuário registrado com sucesso. Aguardando aprovação.', userId: user.id };
 
@@ -277,57 +241,11 @@ export class AuthService {
     });
 
     // Reenvia o e-mail
-    await this.mailerService.sendMail({
-      to: email,
-      subject: 'Seu Novo Código de Verificação',
-      html: `
-    <!DOCTYPE html>
-    <html lang="pt-BR">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Seu Novo Código de Verificação</title>
-    </head>
-    <body style="margin: 0; padding: 0; background-color: #f2f2f2; font-family: Arial, sans-serif;">
-      <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f2f2f2;">
-        <tr>
-          <td align="center">
-            <table width="100%" border="0" cellspacing="0" cellpadding="0" style="width: 100%; max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-              <tr>
-                <td align="center" style="padding: 30px 30px; font-family: Arial, sans-serif;">
-                  <h1 style="font-size: 28px; font-weight: bold; color: #333333; margin: 0;">Seja bem-vindo(a)!</h1>
-                </td>
-              </tr>
-              <tr>
-                <td align="center" style="padding: 10px 30px; font-family: Arial, sans-serif;">
-                  <p style="font-size: 16px; color: #666666; margin: 0;">Use o código de verificação abaixo para confirmar seu e-mail.</p>
-                </td>
-              </tr>
-              <tr>
-                <td align="center" style="padding: 20px 30px;">
-                  <div style="background-color: #f8f8f8; border: 1px solid #dddddd; border-radius: 8px; padding: 15px 20px; display: inline-block;">
-                    <p style="font-size: 32px; font-weight: bold; color: #333333; margin: 0; letter-spacing: 8px; font-family: 'Courier New', Courier, monospace;">
-                      ${verificationCode}
-                    </p>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td align="center" style="padding: 30px; font-family: Arial, sans-serif;">
-                  <p style="font-size: 12px; color: #999999; margin: 0;">
-                    Se você recebeu este e-mail porque uma verificação foi solicitada para sua conta. Caso essa solicitação não seja sua, pedimos que ignore este e-mail.
-                  </p>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-      </table>
-    </body>
-    </html>
-  `,
+    await this.emailQueue.add('send-verification-email', {
+      email: user.email,
+      name: user.name,
+      verificationCode: verificationCode,
     });
-
     return { message: 'Se um conta com este e-mail existir, um novo código foi enviado.' };
   }
 
