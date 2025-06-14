@@ -1,4 +1,4 @@
-import { Injectable, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpStatus, UnauthorizedException, ForbiddenException, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
@@ -48,7 +48,7 @@ export class AuthService {
 
   async refreshToken(token: string) {
     if (!token) {
-      throw new Error('Refresh token não encontrado', { cause: { statusCode: HttpStatus.UNAUTHORIZED } });
+      throw new UnauthorizedException('Refresh token não encontrado');
     }
 
     try {
@@ -57,17 +57,17 @@ export class AuthService {
       });
 
       const user = await this.prisma.user.findUnique({ where: { id: payload.sub } });
-      if (!user || !user.refreshToken) throw new Error('Acesso Negado');
+      if (!user || !user.refreshToken) throw new ForbiddenException('Acesso Negado');
 
       const refreshTokenMatches = await bcrypt.compare(token, user.refreshToken);
-      if (!refreshTokenMatches) throw new Error('Acesso Negado');
+      if (!refreshTokenMatches) throw new ForbiddenException('Acesso Negado');
 
       const tokens = await this.generateTokens(user.id, user.email);
       await this.updateRefreshToken(user.id, tokens.refreshToken);
 
       return tokens;
     } catch (e) {
-      throw new Error('Refresh token inválido ou expirado', { cause: { statusCode: HttpStatus.FORBIDDEN } });
+      throw new ForbiddenException('Refresh token inválido ou expirado');
     }
   }
 
@@ -88,34 +88,24 @@ export class AuthService {
     })
 
     if (!user) {
-      throw new Error("Credenciais inválidas", {
-        cause: { statusCode: HttpStatus.UNAUTHORIZED },
-      })
+      throw new UnauthorizedException("Credenciais inválidas");
     }
 
     // Verificar se o email foi verificado
     if (!user.emailVerified) {
-      throw new Error("EMAIL_NOT_VERIFIED", {
-        cause: { statusCode: HttpStatus.FORBIDDEN },
-      })
+      throw new ForbiddenException("EMAIL_NOT_VERIFIED");
     }
 
     // Verificar a senha
     const isPasswordValid = await bcrypt.compare(password, user.password)
     if (!isPasswordValid) {
-      throw new Error("Credenciais inválidas", {
-        cause: { statusCode: HttpStatus.UNAUTHORIZED },
-      })
+      throw new UnauthorizedException("Credenciais inválidas")
     }
 
     if (user.status == 'PENDING') {
-      throw new Error('Sua conta ainda não foi aprovada pelo administrador', {
-        cause: { statusCode: HttpStatus.FORBIDDEN }
-      });
+      throw new ForbiddenException('Sua conta ainda não foi aprovada pelo administrador');
     } else if (user.status == 'SUSPENDED') {
-      throw new Error('Sua conta foi suspensa. Contate o suporte.', {
-        cause: { statusCode: HttpStatus.FORBIDDEN }
-      });
+      throw new ForbiddenException('Sua conta foi suspensa. Contate o suporte.');
     }
 
     // Gerar token JWT para autenticação
@@ -134,7 +124,7 @@ export class AuthService {
     // Verificar se o email já existe
     const existingUser = await this.prisma.user.findUnique({ where: { email } });
     if (existingUser) {
-      throw new Error('Email já registrado', { cause: { statusCode: HttpStatus.CONFLICT } });
+      throw new ConflictException('Email já registrado');
     }
 
     // Hash da senha
@@ -184,24 +174,23 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({ where: { email } });
 
     if (!user) {
-      throw new Error('Usuário não encontrado.', { cause: { statusCode: HttpStatus.NOT_FOUND } });
+      throw new NotFoundException('Usuário não encontrado.');
     }
     if (user.emailVerified) {
       return { message: 'Este e-mail já foi verificado.' };
     }
     if (!user.emailVerificationCode || !user.emailVerificationCodeExpiresAt) {
-      throw new Error('Nenhum código de verificação pendente.', { cause: { statusCode: HttpStatus.BAD_REQUEST } });
+      throw new BadRequestException('Nenhum código de verificação pendente.');
     }
     if (new Date() > user.emailVerificationCodeExpiresAt) {
-      // Opcional: Limpar o código expirado
       await this.prisma.user.update({ where: { email }, data: { emailVerificationCode: null, emailVerificationCodeExpiresAt: null } });
-      throw new Error('Código de verificação expirado.', { cause: { statusCode: HttpStatus.BAD_REQUEST } });
+      throw new BadRequestException('Código de verificação expirado.');
     }
 
     const isCodeValid = await bcrypt.compare(code, user.emailVerificationCode);
 
     if (!isCodeValid) {
-      throw new Error('Código de verificação inválido.', { cause: { statusCode: HttpStatus.BAD_REQUEST } });
+      throw new BadRequestException('Código de verificação inválido.');
     }
 
     // Sucesso! Ativa o usuário e limpa os campos de verificação
@@ -221,10 +210,10 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({ where: { email } });
 
     if (!user) {
-      throw new Error('Se este e-mail estiver registrado, um código foi enviado.', { cause: { statusCode: HttpStatus.OK } });
+      return { message: 'Se um conta com este e-mail existir, um novo código foi enviado.' };
     }
     if (user.emailVerified) {
-      throw new Error('Este e-mail já foi verificado.', { cause: { statusCode: HttpStatus.BAD_REQUEST } });
+      throw new BadRequestException('Este e-mail já foi verificado.');
     }
 
     // Gera e salva um novo código e expiração

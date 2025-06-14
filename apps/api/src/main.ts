@@ -3,12 +3,15 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import cookieParser = require('cookie-parser');
+import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  const configService = app.get(ConfigService);
+
   app.enableCors({
-    origin: 'http://localhost:5173', // Porta do Vite
+    origin: configService.get<string>('CORS_ORIGIN', 'http://localhost:5173'), // Usar variável
     credentials: true,
   });
 
@@ -22,7 +25,7 @@ async function bootstrap() {
     }),
   );
 
-  const configService = app.get(ConfigService);
+  app.useGlobalFilters(new AllExceptionsFilter());
 
   await app.listen(configService.get('PORT') ?? 3000);
 }
