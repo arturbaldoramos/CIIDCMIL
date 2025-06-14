@@ -2,12 +2,31 @@ import { UsersModule } from './users/users.module';
 import { PrismaModule } from './../prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { LoggerModule } from 'nestjs-pino';
 
 @Module({
   imports: [
+    LoggerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        pinoHttp: {
+          level: configService.get<string>('NODE_ENV') !== 'production' ? 'debug' : 'info',
+          transport:
+            configService.get<string>('NODE_ENV') !== 'production'
+              ? {
+                target: 'pino-pretty', // Formato legível para dev
+                options: {
+                  singleLine: true,
+                },
+              }
+              : undefined, // Formato JSON para prod
+        },
+      }),
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
