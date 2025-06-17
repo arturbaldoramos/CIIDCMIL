@@ -1,13 +1,13 @@
-import { Controller, Post, Body, HttpException, HttpStatus, Get, Query, HttpCode, Req, Res, UseGuards } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { LoginDto } from './dtos/login.dto';
+import { Controller, Post, Body, HttpStatus, Get, HttpCode, Req, Res, UseGuards } from '@nestjs/common';
+import { AuthService } from '@/auth/auth.service';
+import { LoginDto } from '@/auth/dtos/login.dto';
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { VerifyEmailDto } from './dtos/verify-email.dto';
+import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
+import { VerifyEmailDto } from '@/auth/dtos/verify-email.dto';
 import { Throttle } from '@nestjs/throttler';
-import { RegisterDto } from './dtos/register.dto';
-import { ResendCodeDto } from './dtos/resend-code.dto';
+import { RegisterDto } from '@/auth/dtos/register.dto';
+import { ResendCodeDto } from '@/auth/dtos/resend-code.dto';
 
 
 @Controller('auth')

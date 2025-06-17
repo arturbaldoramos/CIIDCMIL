@@ -1,9 +1,8 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
-import { PrismaService } from 'prisma/prisma.service';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserDto } from '@/users/dto/update-user.dto';
+import { PrismaService } from '@/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { Prisma, User as UserModel } from '@prisma/client';
-
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) { }
