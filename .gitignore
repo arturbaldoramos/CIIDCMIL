@@ -32,7 +32,6 @@ dist-ssr
 ./apps/api/pnpm-debug.log*
 ./apps/api/lerna-debug.log*
 ./apps/api/generated/prisma
-./api/tsconfig.build.tsbuildinfo
 
 #web
 ./apps/web/logs

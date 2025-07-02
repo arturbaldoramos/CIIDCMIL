@@ -1,14 +1,14 @@
-import { AuthService } from '@/auth/auth.service';
+import { AuthService } from './auth.service';
 import { Module } from '@nestjs/common';
-import { AuthController } from '@/auth/auth.controller';
+import { AuthController } from './auth.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
-import { PrismaModule } from '@/prisma/prisma.module';
+import { PrismaModule } from 'prisma/prisma.module';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { JwtStrategy } from '@/auth/strategies/jwt.strategy';
+import { JwtStrategy } from './strategies/jwt.strategy';
 import { BullModule } from '@nestjs/bull';
-import { EmailProcessor } from '@/auth/email.processor';
+import { EmailProcessor } from './email.processor';
 
 @Module({
     imports: [

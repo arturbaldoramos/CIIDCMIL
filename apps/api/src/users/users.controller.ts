@@ -1,9 +1,9 @@
-import { Controller, Get, Body, Patch, Param, Delete, UseGuards, Req, ParseIntPipe } from '@nestjs/common';
-import { UsersService } from '@/users/users.service';
-import { UpdateUserDto } from '@/users/dto/update-user.dto';
-import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
-import { RolesGuard } from '@/auth/guards/roles.guard';
-import { Roles } from '@/auth/decorators/roles.decorator';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, ParseIntPipe, HttpException, HttpStatus } from '@nestjs/common';
+import { UsersService } from './users.service';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 
 @UseGuards(JwtAuthGuard, RolesGuard) // Aplica guardas a todo o controller

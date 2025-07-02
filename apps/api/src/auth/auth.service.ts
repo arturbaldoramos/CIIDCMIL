@@ -1,10 +1,11 @@
-import { Injectable, UnauthorizedException, ForbiddenException, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, HttpStatus, UnauthorizedException, ForbiddenException, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
-import { LoginDto } from '@/auth/dtos/login.dto';
-import { RegisterDto } from '@/auth/dtos/register.dto';
+import { LoginDto } from './dtos/login.dto';
+import { RegisterDto } from './dtos/register.dto';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 

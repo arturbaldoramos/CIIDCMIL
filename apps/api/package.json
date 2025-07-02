@@ -6,8 +6,8 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "dev": "nest start --watch -r tsconfig-paths/register",
-    "build": "prisma generate && tsc --project tsconfig.build.json",
+    "dev": "nest start --watch",
+   "build": "prisma generate && nest build",
     "start": "node dist/main.js",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start:debug": "nest start --debug --watch",
