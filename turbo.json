@@ -10,14 +10,6 @@
     "dev": {
       "persistent": true,
       "cache": false
-    },
-    "start": {
-      "persistent": true,
-      "cache": false
-    },
-    "start:prod": {
-      "persistent": true,
-      "cache": false
     }
   }
 }
