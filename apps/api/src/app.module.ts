@@ -5,6 +5,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { QuestionnaireModule } from './questionnaire/questionnaire.module';
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
     }]),
     PrismaModule,
     AuthModule,
-    UsersModule
+    UsersModule,
+    QuestionnaireModule
   ],
   controllers: [],
   providers: [
