@@ -7,6 +7,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Status {
+  PENDING
+  APPROVED
+  SUSPENDED
+}
+
 model User {
   id            Int     @id @default(autoincrement())
   email         String  @unique
@@ -20,17 +31,43 @@ model User {
   emailVerificationCode          String?
   emailVerificationCodeExpiresAt DateTime?
 
+  questionnaires Questionnaire[] @relation("UserQuestionnaires")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-enum Role {
-  USER
-  ADMIN
+model Questionnaire {
+  id          String      @id @default(uuid())
+  title       String
+  description String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  authorId    Int
+  author      User        @relation("UserQuestionnaires", fields: [authorId], references: [id])
+  questions   Question[]
+  answers     Answer[]
 }
 
-enum Status {
-  PENDING
-  APPROVED
-  SUSPENDED
+model Question {
+  id              Int           @id @default(autoincrement())
+  text            String
+  order           Int           // Para manter a ordem das perguntas
+  questionnaireId String
+  questionnaire   Questionnaire @relation(fields: [questionnaireId], references: [id], onDelete: Cascade)
+  answers         Answer[]
+
+  @@unique([questionnaireId, order])
+}
+
+model Answer {
+  id              Int           @id @default(autoincrement())
+  value           Int           // Valor de 0 a 10
+  questionId      Int
+  question        Question      @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionnaireId String
+  questionnaire   Questionnaire @relation(fields: [questionnaireId], references: [id], onDelete: Cascade)
+  createdAt       DateTime      @default(now())
+
+  @@unique(questionId)
 }
