@@ -66,7 +66,7 @@ export class UsersService {
       dataToUpdate.password = await bcrypt.hash(dto.password, 10);
     }
 
-    // NOVO: Lógica para invalidar a sessão se o status for alterado para SUSPENDED
+    // Lógica para invalidar a sessão se o status for alterado para SUSPENDED
     if (dto.status === 'SUSPENDED') {
       dataToUpdate.refreshToken = null;
     }
@@ -76,15 +76,5 @@ export class UsersService {
       data: dataToUpdate, // Usa o objeto de dados preparado
       select: { id: true, email: true, name: true, role: true, status: true },
     });
-  }
-
-  // DELETE
-  async remove(id: number) {
-    const user = await this.prisma.user.findUnique({ where: { id } });
-    if (!user) {
-      throw new NotFoundException('Usuário não encontrado.');
-    }
-    await this.prisma.user.delete({ where: { id } });
-    return { message: 'Usuário deletado com sucesso.' };
   }
 }

@@ -32,10 +32,4 @@ export class UsersController {
     update(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto, @Req() req) {
         return this.usersService.update(id, updateUserDto, req.user);
     }
-
-    @Delete(':id')
-    @Roles(Role.ADMIN) // Apenas admins podem deletar usuários
-    remove(@Param('id', ParseIntPipe) id: number) {
-        return this.usersService.remove(id);
-    }
 }
