@@ -30,8 +30,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       where: { id: payload.sub },
     });
 
-    if (!user) {
-      throw new UnauthorizedException('Usuário não encontrado');
+    if (!user || !user.refreshToken) {
+      throw new UnauthorizedException('Acesso negado. Por favor, faça o login novamente.');
     }
     
     // O que for retornado aqui será anexado ao objeto `req.user`
