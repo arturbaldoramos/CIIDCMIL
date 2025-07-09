@@ -3,13 +3,13 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useVerification } from '@/context/VerificationProvider';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/Components/ui/dialog';
-import { Button } from '@/Components/ui/button';
-import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/Components/ui/input-otp';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/Components/ui/form';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import api from '@/lib/api';
 import { useNavigate } from 'react-router-dom';
-import { Alert, AlertDescription } from '@/Components/ui/alert';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ExclamationTriangleIcon, CheckCircledIcon } from '@radix-ui/react-icons';
 
 const OTPSchema = z.object({ code: z.string().min(6, { message: 'O código deve ter 6 dígitos.' }) });

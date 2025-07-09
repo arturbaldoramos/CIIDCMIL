@@ -1,15 +1,17 @@
-import { lazy, Suspense } from 'react'; 
+import { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ThemeProvider } from './Components/theme-provider';
-import { Toaster } from "@/Components/ui/sonner";
-import ProtectedRoute from './Components/ProtectedRoute';
+import { ThemeProvider } from './components/theme-provider';
+import { Toaster } from "@/components/ui/sonner";
+import ProtectedRoute from './components/ProtectedRoute';
 import { VerificationProvider } from './context/VerificationProvider';
-import { VerificationDialog } from './Components/VerificationDialog';
+import { VerificationDialog } from './components/VerificationDialog';
+import { Dashboard } from './pages/Dashboard';
+import { User } from 'lucide-react';
+import { UserProvider } from './context/UserProvider';
 
 const HomePage = lazy(() => import('./pages/HomePage').then(module => ({ default: module.HomePage })));
 const WelcomePage = lazy(() => import('./pages/WelcomePage').then(module => ({ default: module.WelcomePage })));
 const LoginPage = lazy(() => import('./pages/LoginPage'));
-const Dashboard = lazy(() => import('./pages/Dashboard').then(module => ({ default: module.Dashboard })));
 
 function App() {
   return (
@@ -29,10 +31,13 @@ function App() {
                 path="/dashboard"
                 element={
                   <ProtectedRoute>
-                    <Dashboard />
+                    <UserProvider>
+                      <Dashboard />
+                    </UserProvider>
                   </ProtectedRoute>
                 }
               />
+
             </Routes>
           </Suspense>
         </Router>

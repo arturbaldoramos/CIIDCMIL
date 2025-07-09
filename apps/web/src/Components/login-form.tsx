@@ -5,10 +5,10 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { useNavigate } from "react-router-dom" // Passo 1: Importe o hook
 import { cn } from "@/lib/utils"
-import { Button } from "@/Components/ui/button"
-import { Card, CardContent } from "@/Components/ui/card"
-import { Input } from "@/Components/ui/input"
-import { Alert, AlertDescription } from "@/Components/ui/alert"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import {
   Form,
   FormControl,
@@ -16,7 +16,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/Components/ui/form"
+} from "@/components/ui/form"
 
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons"
 import { useState } from "react"
