@@ -5,9 +5,11 @@ import { Toaster } from "@/components/ui/sonner";
 import ProtectedRoute from './components/ProtectedRoute';
 import { VerificationProvider } from './context/VerificationProvider';
 import { VerificationDialog } from './components/VerificationDialog';
-import { Dashboard } from './pages/Dashboard';
-import { User } from 'lucide-react';
 import { UserProvider } from './context/UserProvider';
+import DashboardLayout from './components/DashboardLayout';
+import Analytics from './pages/Analytics';
+import Settings from './pages/Settings';
+import { Dashboard } from './pages/Dashboard';
 
 const HomePage = lazy(() => import('./pages/HomePage').then(module => ({ default: module.HomePage })));
 const WelcomePage = lazy(() => import('./pages/WelcomePage').then(module => ({ default: module.WelcomePage })));
@@ -26,17 +28,23 @@ function App() {
               <Route path="/welcome" element={<WelcomePage />} />
               <Route path="/login" element={<LoginPage />} />
 
-              {/* Rota Protegida */}
+              {/* Rota Protegida com Layout */}
               <Route
                 path="/dashboard"
                 element={
                   <ProtectedRoute>
                     <UserProvider>
-                      <Dashboard />
+                      <DashboardLayout />
                     </UserProvider>
                   </ProtectedRoute>
                 }
-              />
+              >
+                {/* Rota aninhada principal */}
+                <Route index element={<Dashboard />} />
+                {/* Outras rotas aninhadas */}
+                <Route path="analytics" element={<Analytics />} />
+                <Route path="settings" element={<Settings />} />
+              </Route>
 
             </Routes>
           </Suspense>

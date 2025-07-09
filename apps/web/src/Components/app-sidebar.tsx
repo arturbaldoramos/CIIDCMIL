@@ -1,73 +1,155 @@
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
+import {
+  IconCirclePlusFilled,
+  IconInnerShadowTop,
+  IconMail,
+} from "@tabler/icons-react"
 
+import {
+  LayoutDashboard,
+  BarChart3,
+  Settings,
+  MoreVertical,
+  LogOut,
+} from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
+  SidebarFooter,
+  SidebarHeader,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import { useUser } from "@/context/UserProvider"
+  SidebarMenuButton,
+  SidebarSeparator,
+  SidebarGroupContent,
+  SidebarGroup,
+  SidebarGroupLabel,
+} from "@/components/ui/sidebar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useUser } from "@/context/UserProvider";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { Avatar, AvatarFallback } from "./ui/avatar";
+import api from "@/lib/api";
+import { Button } from "./ui/button";
 
+// Hook customizado para verificar se a rota está ativa
+const useIsActive = (path: string) => {
+  const location = useLocation();
+  return location.pathname === path || location.pathname.startsWith(`${path}/`);
+};
 
-const items = [
-  {
-    title: "Home",
-    url: "/",
-    icon: Home,
-  },
-  {
-    title: "Inbox",
-    url: "#",
-    icon: Inbox,
-  },
-  {
-    title: "Calendar",
-    url: "#",
-    icon: Calendar,
-  },
-  {
-    title: "Search",
-    url: "#",
-    icon: Search,
-  },
-  {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
-  },
-]
+const NavItem = ({ to, icon: Icon, children }: { to: string, icon: React.ElementType, children: React.ReactNode }) => {
+  const isActive = useIsActive(to);
+  return (
+    <SidebarMenuItem>
+      <SidebarMenuButton asChild isActive={isActive}>
+        <NavLink to={to}>
+          <Icon />
+          <span>{children}</span>
+        </NavLink>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
+  );
+};
 
 export function AppSidebar() {
-  const { user } = useUser() // 2. Use o hook para obter os dados
+  const { user } = useUser();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await api.post('/auth/logout');
+    } catch (error) {
+      console.error("Logout failed", error);
+    } finally {
+      localStorage.removeItem('accessToken');
+      navigate('/login');
+    }
+  };
+
+  const getInitials = (name: string = '') => {
+    if (!name) return '';
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase();
+  };
 
   return (
-    <Sidebar>
+    <Sidebar collapsible="offcanvas">
+
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              className="data-[slot=sidebar-menu-button]:!p-1.5"
+            >
+              <a href="/dashboard">
+                <IconInnerShadowTop className="!size-5" />
+                <span className="text-base font-semibold">CIIDCMIL</span>
+              </a>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
+
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
-          <SidebarGroupContent>
+          <SidebarGroupLabel>Platform</SidebarGroupLabel>
+          <SidebarGroupContent className="flex flex-col gap-2">
             <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-                <SidebarMenuItem>
-                    <span>{user?.email}</span>
-                </SidebarMenuItem>
+              <SidebarMenuItem>
+                <NavItem to="/dashboard" icon={LayoutDashboard}>Principal</NavItem>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <NavItem to="/dashboard/analytics" icon={BarChart3}>Analytics</NavItem>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <NavItem to="/dashboard/settings" icon={Settings}>Configurações</NavItem>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
+      <SidebarFooter>
+        <SidebarSeparator />
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton
+                  size="lg"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground w-full"
+                >
+                  <Avatar className="h-8 w-8 rounded-lg">
+                    <AvatarFallback className="rounded-lg">{getInitials(user?.name)}</AvatarFallback>
+                  </Avatar>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-medium">{user?.name || 'Usuário'}</span>
+                    <span className="text-muted-foreground truncate text-xs">
+                      {user?.email || 'email@exemplo.com'}
+                    </span>
+                  </div>
+                  <MoreVertical className="ml-auto size-4" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" side="top" align="start">
+                <DropdownMenuItem variant="destructive" onSelect={handleLogout}>
+                  <LogOut className="mr-2 size-4" />
+                  Sair
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
-  )
+  );
 }
