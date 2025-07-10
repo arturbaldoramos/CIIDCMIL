@@ -11,9 +11,9 @@ import { Role } from '@prisma/client';
 export class UsersController {
     constructor(private readonly usersService: UsersService) { }
 
-    @UseGuards(JwtAuthGuard)
     @Get()
     @Roles(Role.ADMIN) // Apenas admins podem listar todos os usuários
+    @UseGuards(JwtAuthGuard, RolesGuard) // Garante que o usuário esteja autenticado e tenha a role correta
     findAll() {
         return this.usersService.findAll();
     }
@@ -24,9 +24,9 @@ export class UsersController {
         return this.usersService.findById(req.user.userId);
     }
 
-    @UseGuards(JwtAuthGuard)
     @Get(':id')
     @Roles(Role.ADMIN) // Apenas admins podem buscar usuários por ID
+    @UseGuards(JwtAuthGuard, RolesGuard)
     findOne(@Param('id', ParseIntPipe) id: number) {
         return this.usersService.findById(id);
     }
