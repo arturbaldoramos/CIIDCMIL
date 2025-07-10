@@ -5,14 +5,12 @@ import { SidebarProvider, SidebarInset } from './ui/sidebar';
 const DashboardLayout = () => {
   return (
     <SidebarProvider>
-      <div className="flex h-screen bg-background">
-        <AppSidebar />
-        <SidebarInset>
-            <div className="p-6 overflow-y-auto">
-                <Outlet />
-            </div>
-        </SidebarInset>
-      </div>
+      <AppSidebar />
+      <SidebarInset>
+        <div className="p-6 overflow-y-auto h-full">
+          <Outlet />
+        </div>
+      </SidebarInset>
     </SidebarProvider>
   );
 };

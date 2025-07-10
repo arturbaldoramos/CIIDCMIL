@@ -4,7 +4,7 @@ import {
   Settings,
   MoreVertical,
   LogOut,
-  Heart
+  ClipboardList,
 } from "lucide-react";
 import {
   Sidebar,
@@ -26,14 +26,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useUser } from "@/context/UserProvider";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import api from "@/lib/api";
 
 // Hook customizado para verificar se a rota está ativa
 const useIsActive = (path: string) => {
-  const location = useLocation();
-  return location.pathname === path || location.pathname.startsWith(`${path}/`);
+  if (path === "/dashboard") {
+    return location.pathname === "/dashboard"
+  }
+  return location.pathname.startsWith(path)
 };
 
 const NavItem = ({ to, icon: Icon, children }: { to: string, icon: React.ElementType, children: React.ReactNode }) => {
@@ -75,20 +77,15 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar collapsible="offcanvas">
-
+    <Sidebar collapsible="icon">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
-            >
-              <a>
-                <Heart className="!size-5" />
-                <span className="text-base font-semibold">CIIDCMIL</span>
-              </a>
-            </SidebarMenuButton>
+            <div className="p-6 border-b border-sidebar-border">
+              <h1 className={`font-bold text-xl text-sidebar-primary`}>
+                CIIDCMIL
+              </h1>
+            </div>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
@@ -98,18 +95,10 @@ export function AppSidebar() {
           <SidebarGroupLabel>Platform</SidebarGroupLabel>
           <SidebarGroupContent className="flex flex-col gap-2">
             <SidebarMenu>
-              <SidebarMenuItem>
-                <NavItem to="/dashboard" icon={LayoutDashboard}>Dashboard</NavItem>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <NavItem to="/dashboard/questionnaires" icon={Settings}>Questionarios</NavItem>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <NavItem to="/dashboard/analytics" icon={BarChart3}>Análise</NavItem>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <NavItem to="/dashboard/settings" icon={BarChart3}>Configurações</NavItem>
-              </SidebarMenuItem>
+              <NavItem to="/dashboard" icon={LayoutDashboard}>Dashboard</NavItem>
+              <NavItem to="/dashboard/questionnaires" icon={ClipboardList}>Questionarios</NavItem>
+              <NavItem to="/dashboard/analytics" icon={BarChart3}>Análise</NavItem>
+              <NavItem to="/dashboard/settings" icon={Settings}>Configurações</NavItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

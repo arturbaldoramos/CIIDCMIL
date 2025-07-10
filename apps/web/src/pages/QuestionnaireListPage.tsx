@@ -58,62 +58,63 @@ export default function QuestionnaireListPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Meus Questionários</h1>
-        <Button onClick={() => navigate('/dashboard/questionnaires/new')}>
-          Criar Novo
-        </Button>
-      </div>
-      <Card>
-        <Table>
+    <div className="p-6">
+      <div className="max-w-6xl mx-auto space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">Meus Questionários</h1>
+          <Button onClick={() => navigate('/dashboard/questionnaires/new')}>
+            Criar Novo
+          </Button>
+        </div>
+        <Card>
+          <Table>
             <TableHeader>
-                <TableRow>
-                    <TableHead>Nome</TableHead>
-                    <TableHead>Estado</TableHead>
-                    <TableHead className="text-right">Ações</TableHead>
-                </TableRow>
+              <TableRow>
+                <TableHead>Nome</TableHead>
+                <TableHead>Estado</TableHead>
+                <TableHead className="text-right">Ações</TableHead>
+              </TableRow>
             </TableHeader>
             <TableBody>
-                {questionnaires.map((q) => (
-                    <TableRow key={q.id}>
-                        <TableCell className="font-medium">{q.title}</TableCell>
-                        <TableCell>
-                            <Badge variant={q.isActive ? 'default' : 'destructive'}>
-                                {q.isActive ? 'Ativo' : 'Inativo'}
-                            </Badge>
-                        </TableCell>
-                        <TableCell className="text-right space-x-2">
-                            <Button variant="outline" size="icon" onClick={() => setEditingQuestionnaire(q)}>
-                                <Pencil className="h-4 w-4" />
-                                <span className="sr-only">Edição Rápida</span>
-                            </Button>
-                             <Button variant="outline" size="icon" onClick={() => navigate(`/dashboard/questionnaires/${q.id}/edit`)}>
-                                <Eye className="h-4 w-4" />
-                                <span className="sr-only">Editar Perguntas</span>
-                            </Button>
-                        </TableCell>
-                    </TableRow>
-                ))}
+              {questionnaires.map((q) => (
+                <TableRow key={q.id}>
+                  <TableCell className="font-medium">{q.title}</TableCell>
+                  <TableCell>
+                    <Badge variant={q.isActive ? 'default' : 'outline'}>
+                      {q.isActive ? 'Ativo' : 'Inativo'}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right space-x-2">
+                    <Button variant="outline" size="icon" onClick={() => setEditingQuestionnaire(q)}>
+                      <Pencil className="h-4 w-4" />
+                      <span className="sr-only">Edição Rápida</span>
+                    </Button>
+                    <Button variant="outline" size="icon" onClick={() => navigate(`/dashboard/questionnaires/${q.id}/edit`)}>
+                      <Eye className="h-4 w-4" />
+                      <span className="sr-only">Editar Perguntas</span>
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
-        </Table>
-         {questionnaires.length === 0 && (
+          </Table>
+          {questionnaires.length === 0 && (
             <div className="text-center p-8">
-                 <CardTitle>Nenhum questionário encontrado</CardTitle>
-                <CardDescription className="mt-2">
-                    Clique em "Criar Novo" para começar.
-                </CardDescription>
+              <CardTitle>Nenhum questionário encontrado</CardTitle>
+              <CardDescription className="mt-2">
+                Clique em "Criar Novo" para começar.
+              </CardDescription>
             </div>
-        )}
-      </Card>
-      
-      <QuickEditQuestionnaireDialog 
+          )}
+        </Card>
+
+        <QuickEditQuestionnaireDialog
           questionnaire={editingQuestionnaire}
           isOpen={!!editingQuestionnaire}
           onClose={() => setEditingQuestionnaire(null)}
           onSave={handleUpdateList}
           onDelete={handleDeleteFromList}
-      /> 
-    </div>
-  );
+        />
+      </div>
+    </div>);
 }

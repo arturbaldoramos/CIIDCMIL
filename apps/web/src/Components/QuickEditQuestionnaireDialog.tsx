@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
@@ -65,11 +65,11 @@ export function QuickEditQuestionnaireDialog({ questionnaire, isOpen, onClose, o
 
   const handleDelete = async () => {
     try {
-        await api.delete(`/questionnaires/${questionnaire.id}`);
-        onDelete(questionnaire.id);
-        onClose();
+      await api.delete(`/questionnaires/${questionnaire.id}`);
+      onDelete(questionnaire.id);
+      onClose();
     } catch (error) {
-        console.error("Erro ao deletar:", error);
+      console.error("Erro ao deletar:", error);
     }
   };
 
@@ -78,6 +78,9 @@ export function QuickEditQuestionnaireDialog({ questionnaire, isOpen, onClose, o
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Edição Rápida</DialogTitle>
+          <DialogDescription>
+            Altere o título, a descrição e o estado do seu questionário.
+          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSave)} className="space-y-4">
@@ -95,25 +98,25 @@ export function QuickEditQuestionnaireDialog({ questionnaire, isOpen, onClose, o
                 <FormMessage />
               </FormItem>
             )} />
-             <FormField control={form.control} name="isActive" render={({ field }) => (
+            <FormField control={form.control} name="isActive" render={({ field }) => (
               <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
                 <FormLabel>Ativo</FormLabel>
                 <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
               </FormItem>
             )} />
             <DialogFooter className="pt-4">
-                <Popover>
-                    <PopoverTrigger asChild>
-                        <Button type="button" variant="destructive">Excluir</Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-4">
-                        <div className="space-y-2">
-                            <p className="text-sm">Tem certeza?</p>
-                            <Button variant="destructive" size="sm" onClick={handleDelete} className="w-full">Confirmar Exclusão</Button>
-                        </div>
-                    </PopoverContent>
-                </Popover>
-                <Button type="submit">Salvar Alterações</Button>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button type="button" variant="destructive">Excluir</Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-4">
+                  <div className="space-y-2">
+                    <p className="text-sm">Tem certeza?</p>
+                    <Button variant="destructive" size="sm" onClick={handleDelete} className="w-full">Confirmar Exclusão</Button>
+                  </div>
+                </PopoverContent>
+              </Popover>
+              <Button type="submit">Salvar Alterações</Button>
             </DialogFooter>
           </form>
         </Form>

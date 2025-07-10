@@ -41,10 +41,10 @@ export default function EditQuestionnairePage() {
 
   const handleAddQuestion = async () => {
     if (!newQuestionText.trim() || !questionnaire) return;
-    
+
     const newOrder = questionnaire.questions.length > 0
-        ? Math.max(...questionnaire.questions.map(q => q.order)) + 1
-        : 0;
+      ? Math.max(...questionnaire.questions.map(q => q.order)) + 1
+      : 0;
 
     const newQuestion: Question = { text: newQuestionText, order: newOrder };
 
@@ -56,46 +56,47 @@ export default function EditQuestionnairePage() {
       console.error("Erro ao adicionar pergunta:", error);
     }
   };
-  
+
   if (!questionnaire) {
     return <div>Carregando...</div>;
   }
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold">{questionnaire.title}</h1>
-        <p className="text-muted-foreground">{questionnaire.description}</p>
-      </div>
+    <div className="p-6">
+      <div className="max-w-4xl mx-auto space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold">{questionnaire.title}</h1>
+          <p className="text-muted-foreground">{questionnaire.description}</p>
+        </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Adicionar Nova Pergunta</CardTitle>
-        </CardHeader>
-        <CardContent className="flex gap-4">
-          <Input 
-            value={newQuestionText}
-            onChange={(e) => setNewQuestionText(e.target.value)}
-            placeholder="Digite o texto da sua pergunta aqui"
-          />
-          <Button onClick={handleAddQuestion}>Adicionar</Button>
-        </CardContent>
-      </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Adicionar Nova Pergunta</CardTitle>
+          </CardHeader>
+          <CardContent className="flex gap-4">
+            <Input
+              value={newQuestionText}
+              onChange={(e) => setNewQuestionText(e.target.value)}
+              placeholder="Digite o texto da sua pergunta aqui"
+            />
+            <Button onClick={handleAddQuestion}>Adicionar</Button>
+          </CardContent>
+        </Card>
 
-      <div className="space-y-4">
-        <h2 className="text-xl font-bold">Perguntas</h2>
-        {questionnaire.questions.map((question, index) => (
-          <Card key={question.id || index} className="p-4 flex items-center justify-between">
-            <span>{question.order + 1}. {question.text}</span>
-            <Button variant="ghost" size="icon">
-              <TrashIcon className="h-4 w-4" />
-            </Button>
-          </Card>
-        ))}
-        {questionnaire.questions.length === 0 && (
+        <div className="space-y-4">
+          <h2 className="text-xl font-bold">Perguntas</h2>
+          {questionnaire.questions.map((question, index) => (
+            <Card key={question.id || index} className="p-4 flex items-center justify-between">
+              <span>{question.order + 1}. {question.text}</span>
+              <Button variant="ghost" size="icon">
+                <TrashIcon className="h-4 w-4" />
+              </Button>
+            </Card>
+          ))}
+          {questionnaire.questions.length === 0 && (
             <p className="text-muted-foreground text-center py-4">Nenhuma pergunta adicionada ainda.</p>
-        )}
+          )}
+        </div>
       </div>
-    </div>
-  );
+    </div>);
 }
