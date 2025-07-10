@@ -1,15 +1,10 @@
 import {
-  IconCirclePlusFilled,
-  IconInnerShadowTop,
-  IconMail,
-} from "@tabler/icons-react"
-
-import {
   LayoutDashboard,
   BarChart3,
   Settings,
   MoreVertical,
   LogOut,
+  Heart
 } from "lucide-react";
 import {
   Sidebar,
@@ -34,7 +29,6 @@ import { useUser } from "@/context/UserProvider";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import api from "@/lib/api";
-import { Button } from "./ui/button";
 
 // Hook customizado para verificar se a rota está ativa
 const useIsActive = (path: string) => {
@@ -91,7 +85,7 @@ export function AppSidebar() {
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <a href="/dashboard">
-                <IconInnerShadowTop className="!size-5" />
+                <Heart className="!size-5" />
                 <span className="text-base font-semibold">CIIDCMIL</span>
               </a>
             </SidebarMenuButton>
