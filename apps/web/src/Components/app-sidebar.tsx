@@ -84,7 +84,7 @@ export function AppSidebar() {
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <a href="/dashboard">
+              <a>
                 <Heart className="!size-5" />
                 <span className="text-base font-semibold">CIIDCMIL</span>
               </a>
@@ -99,13 +99,16 @@ export function AppSidebar() {
           <SidebarGroupContent className="flex flex-col gap-2">
             <SidebarMenu>
               <SidebarMenuItem>
-                <NavItem to="/dashboard" icon={LayoutDashboard}>Principal</NavItem>
+                <NavItem to="/dashboard" icon={LayoutDashboard}>Dashboard</NavItem>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <NavItem to="/dashboard/analytics" icon={BarChart3}>Analytics</NavItem>
+                <NavItem to="/dashboard/questionnaires" icon={Settings}>Questionarios</NavItem>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <NavItem to="/dashboard/settings" icon={Settings}>Configurações</NavItem>
+                <NavItem to="/dashboard/analytics" icon={BarChart3}>Análise</NavItem>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <NavItem to="/dashboard/settings" icon={BarChart3}>Configurações</NavItem>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>

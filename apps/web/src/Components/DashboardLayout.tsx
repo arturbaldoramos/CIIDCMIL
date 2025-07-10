@@ -8,7 +8,7 @@ const DashboardLayout = () => {
       <div className="flex h-screen bg-background">
         <AppSidebar />
         <SidebarInset>
-            <div className="p-6 overflow-y-auto h-full">
+            <div className="p-6 overflow-y-auto">
                 <Outlet />
             </div>
         </SidebarInset>
