@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
@@ -6,7 +10,7 @@ import { Prisma, User as UserModel } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   // READ (All)
   async findAll() {
@@ -42,15 +46,23 @@ export class UsersService {
   }
 
   // UPDATE
-  async update(id: number, dto: UpdateUserDto, currentUser: Omit<UserModel, 'password'>) {
+  async update(
+    id: number,
+    dto: UpdateUserDto,
+    currentUser: Omit<UserModel, 'password'>,
+  ) {
     // Apenas Admins podem alterar o 'role' ou 'status' de outros usuários
     if ((dto.role || dto.status) && currentUser.role !== 'ADMIN') {
-      throw new ForbiddenException('Apenas administradores podem alterar papéis e status.');
+      throw new ForbiddenException(
+        'Apenas administradores podem alterar papéis e status.',
+      );
     }
 
     // Usuários normais só podem editar seu próprio perfil
     if (currentUser.role !== 'ADMIN' && currentUser.id !== id) {
-      throw new ForbiddenException('Você não tem permissão para editar este usuário.');
+      throw new ForbiddenException(
+        'Você não tem permissão para editar este usuário.',
+      );
     }
 
     const userToUpdate = await this.prisma.user.findUnique({ where: { id } });
