@@ -5,20 +5,20 @@ import { ConfigService } from '@nestjs/config';
 
 @Processor('email') // O nome deve ser o mesmo da fila registrada no módulo
 export class EmailProcessor {
-    constructor(
-        private readonly mailerService: MailerService,
-        private readonly configService: ConfigService,
-    ) { }
+  constructor(
+    private readonly mailerService: MailerService,
+    private readonly configService: ConfigService,
+  ) {}
 
-    @Process('send-verification-email')
-    async handleSendVerificationEmail(job: Job) {
-        const { email, name, verificationCode } = job.data;
+  @Process('send-verification-email')
+  async handleSendVerificationEmail(job: Job) {
+    const { email, name, verificationCode } = job.data;
 
-        await this.mailerService.sendMail({
-            to: email,
-            from: this.configService.get<string>('MAILER_USER'),
-            subject: 'Seu Código de Verificação',
-            html: `
+    await this.mailerService.sendMail({
+      to: email,
+      from: this.configService.get<string>('MAILER_USER'),
+      subject: 'Seu Código de Verificação',
+      html: `
             <!DOCTYPE html>
             <html lang="pt-BR">
             <head>
@@ -64,7 +64,6 @@ export class EmailProcessor {
             </body>
             </html>
           `,
-        });
-    }
-
+    });
+  }
 }

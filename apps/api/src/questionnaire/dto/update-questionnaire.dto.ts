@@ -1,4 +1,11 @@
-import { IsString, MinLength, IsOptional, IsBoolean } from 'class-validator';
+import {
+  IsString,
+  MinLength,
+  IsOptional,
+  IsBoolean,
+  IsArray,
+  IsInt,
+} from 'class-validator';
 
 export class UpdateQuestionnaireDto {
   @IsOptional()
@@ -13,4 +20,9 @@ export class UpdateQuestionnaireDto {
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
+
+  @IsOptional()
+  @IsArray()
+  @IsInt({ each: true })
+  questionIds?: number[];
 }

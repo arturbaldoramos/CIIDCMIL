@@ -1,4 +1,16 @@
-import { Controller, Post, Body, HttpException, HttpStatus, Get, Query, HttpCode, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpException,
+  HttpStatus,
+  Get,
+  Query,
+  HttpCode,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dtos/login.dto';
 import { ConfigService } from '@nestjs/config';
@@ -9,13 +21,12 @@ import { Throttle } from '@nestjs/throttler';
 import { RegisterDto } from './dtos/register.dto';
 import { ResendCodeDto } from './dtos/resend-code.dto';
 
-
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
     private configService: ConfigService,
-  ) { }
+  ) {}
 
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
@@ -89,5 +100,4 @@ export class AuthController {
   checkAuthStatus(@Req() req) {
     return { user: req.user };
   }
-
 }

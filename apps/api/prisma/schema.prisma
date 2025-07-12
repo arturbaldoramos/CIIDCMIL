@@ -1,12 +1,16 @@
-generator client {
-  provider = "prisma-client-js"
-}
-
+// datasource e generator permanecem os mesmos
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+generator client {
+  provider = "prisma-client-js"
+}
+
+// --- ENUMS ---
+
+// Enum para Role e Status do usuário
 enum Role {
   USER
   ADMIN
@@ -18,57 +22,163 @@ enum Status {
   SUSPENDED
 }
 
-model User {
-  id            Int     @id @default(autoincrement())
-  email         String  @unique
-  password      String
-  name          String
-  role          Role    @default(USER)
-  status        Status  @default(PENDING)
-  emailVerified Boolean @default(false)
+// Enums para os dados demográficos
+enum AgeRange {
+  TEN_TO_TWENTY
+  TWENTY_ONE_TO_THIRTY
+  THIRTY_ONE_TO_FORTY
+  FORTY_ONE_TO_FIFTY
+  FIFTY_ONE_PLUS
+}
 
-  refreshToken                   String?   @unique
+enum Gender {
+  MALE
+  FEMALE
+  NON_BINARY
+  PREFER_NOT_TO_SAY
+}
+
+enum Income {
+  LESS_THAN_ONE_MINIMUM
+  ONE_TO_TWO_MINIMUM
+  TWO_TO_THREE_MINIMUM
+  MORE_THAN_FOUR_MINIMUM
+}
+
+// Enums para os dados de feedback
+enum FeedbackQuantity {
+  ADEQUATE
+  HIGH
+  EXCESSIVELY_HIGH
+}
+
+enum FeedbackTime {
+  ADEQUATE
+  TOO_LONG
+}
+
+enum FeedbackDevice {
+  COMPUTER_ONLY
+  SMARTPHONE_AND_COMPUTER
+}
+
+// --- MODELS ---
+
+// Modelo de Usuário
+model User {
+  id                             Int       @id @default(autoincrement())
+  email                          String    @unique
+  name                           String
+  password                       String
+  role                           Role      @default(USER)
+  status                         Status    @default(PENDING)
+  createdAt                      DateTime  @default(now())
+  updatedAt                      DateTime  @updatedAt
+  emailVerified                  Boolean   @default(false)
   emailVerificationCode          String?
   emailVerificationCodeExpiresAt DateTime?
+  refreshToken                   String?   @unique
 
-  questionnaires Questionnaire[] @relation("UserQuestionnaires")
+  // Relação com os questionários que o usuário criou
+  questionnaires Questionnaire[]
+}
+
+// Categoria para as barreiras
+model QuestionCategory {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique // Ex: "Etnocentrismo", "Sexismo"
+  description String?
+
+  // Relação com as perguntas que pertencem a esta categoria
+  questions Question[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
+// Perguntas globais, gerenciadas pelos Admins
+model Question {
+  id    Int    @id @default(autoincrement())
+  text  String
+  order Int // Ordem da pergunta dentro da categoria
+
+  // Relação com a categoria (barreira)
+  categoryId Int
+  category   QuestionCategory @relation(fields: [categoryId], references: [id])
+
+  // Relação com os questionários que utilizam esta pergunta
+  questionnaires Questionnaire[] @relation("QuestionnaireQuestions")
+
+  // Relação com as respostas dadas para esta pergunta
+  answers Answer[]
+
+  @@unique([categoryId, order])
+}
+
+// Modelo do Questionário
 model Questionnaire {
-  id          String      @id @default(uuid())
+  id          String  @id @default(cuid())
   title       String
   description String?
-  isActive    Boolean     @default(true)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  authorId    Int
-  author      User        @relation("UserQuestionnaires", fields: [authorId], references: [id])
-  questions   Question[]
-  answers     Answer[]
+  isActive    Boolean @default(true)
+
+  // Localização do questionário
+  country String
+  state   String
+  city    String
+
+  // Relação com o autor
+  authorId Int
+  author   User @relation(fields: [authorId], references: [id])
+
+  // Relação com as perguntas selecionadas para este questionário
+  questions Question[] @relation("QuestionnaireQuestions")
+
+  // Relação com todas as submissões de respostas
+  submissions Submission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-model Question {
-  id              Int           @id @default(autoincrement())
-  text            String
-  order           Int           // Para manter a ordem das perguntas
+// Modelo para uma submissão completa de respostas
+model Submission {
+  id Int @id @default(autoincrement())
+
+  // Relação com o questionário respondido
   questionnaireId String
   questionnaire   Questionnaire @relation(fields: [questionnaireId], references: [id], onDelete: Cascade)
-  answers         Answer[]
 
-  @@unique([questionnaireId, order])
+  // --- DADOS DEMOGRÁFICOS DO RESPONDENTE ---
+  ageRange AgeRange?
+  gender   Gender?
+  income   Income?
+
+  // --- RESPOSTAS DA PESQUISA ---
+  answers Answer[]
+
+  // --- DADOS DE FEEDBACK DO QUESTIONÁRIO ---
+  feedbackQuantity FeedbackQuantity?
+  feedbackTime     FeedbackTime?
+  feedbackDevice   FeedbackDevice?
+
+  createdAt DateTime @default(now())
+
+  @@index([questionnaireId])
 }
 
+// Resposta individual para uma pergunta
 model Answer {
-  id              Int           @id @default(autoincrement())
-  value           Int           // Valor de 0 a 10
-  questionId      Int
-  question        Question      @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  questionnaireId String
-  questionnaire   Questionnaire @relation(fields: [questionnaireId], references: [id], onDelete: Cascade)
-  createdAt       DateTime      @default(now())
+  id    Int @id @default(autoincrement())
+  value Int // Resposta de 0 a 10
 
-  @@unique(questionId)
+  // Relação com a pergunta
+  questionId Int
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  // Relação com a submissão geral
+  submissionId Int
+  submission   Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@index([submissionId])
 }

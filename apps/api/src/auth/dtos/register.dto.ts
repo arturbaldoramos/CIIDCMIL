@@ -11,7 +11,8 @@ export class RegisterDto {
   @IsString()
   @MinLength(8)
   @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-    message: 'Senha fraca. Deve conter pelo menos 8 caracteres, uma maiúscula, uma minúscula e um número ou símbolo.',
+    message:
+      'Senha fraca. Deve conter pelo menos 8 caracteres, uma maiúscula, uma minúscula e um número ou símbolo.',
   })
   password: string;
 }

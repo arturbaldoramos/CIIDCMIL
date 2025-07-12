@@ -1,8 +1,17 @@
-import { Controller, Post, Body, UseGuards, Req, Param, Get, Put, Patch } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  Req,
+  Param,
+  Get,
+  Patch,
+  Delete,
+} from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { QuestionnaireService } from './questionnaire.service';
 import { CreateQuestionnaireDto } from './dto/create-questionnaire.dto';
-import { CreateUpdateQuestionDto } from './dto/create-update-question.dto';
 import { UpdateQuestionnaireDto } from './dto/update-questionnaire.dto';
 
 @Controller('questionnaires')
@@ -27,17 +36,25 @@ export class QuestionnaireController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Put(':id/question')
-  addOrUpdateQuestion(
-    @Param('id') id: string,
-    @Body() questionDto: CreateUpdateQuestionDto,
-    @Req() req,
-  ) {
-    return this.questionnaireService.addOrUpdateQuestion(id, questionDto, req.user.userId);
+  @Get()
+  findAllByAuthor(@Req() req) {
+    return this.questionnaireService.findAllByAuthor(req.user.userId);
   }
-  
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':id/edit')
+  findOneToEdit(@Param('id') id: string, @Req() req) {
+    return this.questionnaireService.findOneToEdit(id, req.user.userId);
+  }
+
   @Get(':id/answer') // Rota pública para buscar o questionário para responder
   findOneToAnswer(@Param('id') id: string) {
     return this.questionnaireService.findOneToAnswer(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  delete(@Param('id') id: string, @Req() req) {
+    return this.questionnaireService.delete(id, req.user.userId);
   }
 }
